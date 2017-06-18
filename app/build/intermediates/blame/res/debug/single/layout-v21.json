@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "/Users/fedorparetsky/ParCare/app/build/intermediates/res/merged/debug/layout-v21/notification_template_custom_big.xml",
+        "source": "/Users/fedorparetsky/.android/build-cache/79bd04979ec1703b57288e6fa6dcf41cc1e6b41c/output/res/layout-v21/notification_template_custom_big.xml"
+    },
+    {
+        "merged": "/Users/fedorparetsky/ParCare/app/build/intermediates/res/merged/debug/layout-v21/notification_action.xml",
+        "source": "/Users/fedorparetsky/.android/build-cache/79bd04979ec1703b57288e6fa6dcf41cc1e6b41c/output/res/layout-v21/notification_action.xml"
+    },
+    {
+        "merged": "/Users/fedorparetsky/ParCare/app/build/intermediates/res/merged/debug/layout-v21/notification_action_tombstone.xml",
+        "source": "/Users/fedorparetsky/.android/build-cache/79bd04979ec1703b57288e6fa6dcf41cc1e6b41c/output/res/layout-v21/notification_action_tombstone.xml"
+    },
+    {
+        "merged": "/Users/fedorparetsky/ParCare/app/build/intermediates/res/merged/debug/layout-v21/notification_template_icon_group.xml",
+        "source": "/Users/fedorparetsky/.android/build-cache/79bd04979ec1703b57288e6fa6dcf41cc1e6b41c/output/res/layout-v21/notification_template_icon_group.xml"
+    }
+]

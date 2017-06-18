@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "/Users/fedorparetsky/ParCare/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi/ic_launcher_round.png",
+        "source": "/Users/fedorparetsky/ParCare/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "/Users/fedorparetsky/ParCare/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi/ic_launcher.png",
+        "source": "/Users/fedorparetsky/ParCare/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png"
+    }
+]
