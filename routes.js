@@ -27,7 +27,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
           } else {
               console.log('spot_id as sent:' + req.body.spot_id);
 	            console.log(colors.green(query));
-              res.json(rows);
+              res.json(rows[0]);
           }
       });
   });
