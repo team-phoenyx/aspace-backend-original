@@ -1,7 +1,8 @@
 //dependencies
-var colors = require("colors/safe");
-var mysql = require("mysql");
-var bcrypt = require("bcrypt");
+const colors = require("colors/safe");
+const mysql = require("mysql");
+//var bcrypt = require("bcrypt");
+const request = require("request-promise");
 
 function REST_ROUTER(router,connection) {
     var self = this;
@@ -74,27 +75,37 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
           }
     });
 });
-
 router.post("/spots/closest/",function(req,res){
-    //var query = "SELECT id_num, lat, lon FROM spots WHERE status = 'T'";
     var query = `SELECT open_spots.spot_id, open_spots.lat, open_spots.lon
 FROM spots AS open_spots WHERE open_spots.status = 'F'
 ORDER BY (POWER((open_spots.lon - ${req.body.lon}), 2.0) + POWER((open_spots.lat - ${req.body.lat}), 2.0))
 LIMIT 1`
     // Returns a single JSON object with the closest lat/lon to the destination.
-    // UPDATE: Made code less expensive by removing SQRT operation from the SQL query.
     connection.query(query,function(err,rows){
       if(err) {
           console.log(`dest. lat as sent: ${req.body.lat}\ndest. lon as sent: ${req.body.lon}`);
           console.log(colors.red('operation failed...'));
           res.json({"error" : "operation failed"});
       } else {
-          console.log(`closet lat to dest.: ${rows[0].lat}\nclosest lon to dest.: ${rows[0].lon}`);
-          console.log(colors.green(query));
-          res.json(rows[0]);
-      }
+          var token = 'pk.eyJ1IjoicGFyY2FyZSIsImEiOiJjajN2cjU4MGkwMGE1MnFvN3cxOWY5azFlIn0.qmmgzy-RijWWqV-ZbmiZbg';
+            options = {
+              uri: `https://api.mapbox.com/directions/v5/mapbox/driving/${req.body.lon},${req.body.lat};${rows[0].lon},${rows[0].lat}?access_token=${token}`,
+              method: "GET"
+            };
+            request(options)
+            // send a GET request to the Mapbox API
+              .then (function(response){
+                var json = JSON.parse(response);
+                // parse the response into JSON
+                var route = json.routes[0];
+                console.log(`distance: ${route.distance} meters`);
+                res.json({"spot_id" : rows[0].spot_id, "lat" : rows[0].lat, "lon" : rows[0].lon, "distance" : route.distance});
+              })
+              .catch(function (err) {
+                console.log(colors.red("error with Mapbox request."))
+              })
+          }
+      });
   });
-});
-
 }
 module.exports = REST_ROUTER;
