@@ -24,7 +24,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
               console.log('spot_id as sent:' + req.body.spot_id);
               console.log(colors.red('query failed...'));
               console.log(colors.red(query));
-              res.json({"error" : "query failed"});
+              res.json({"message" : "operation failed"});
           } else {
               console.log('spot_id as sent:' + req.body.spot_id);
 	            console.log(colors.green(query));
@@ -44,7 +44,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
               console.log('upper LON bound as sent:' + req.body.upper_lon);
               console.log(colors.red('query failed...'));
               console.log(colors.red(query));
-              res.json({"error" : "query failed"});
+              res.json({"message" : "operation failed"});
           } else {
               console.log('lower LAT bound as sent:' + req.body.lower_lat);
               console.log('lower LON bound as sent:' + req.body.lower_lon);
@@ -65,7 +65,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
               console.log('status as sent:' + req.body.status);
               console.log(colors.red('query failed...'));
               console.log(colors.red(query));
-              res.json({"error" : "query failed"});
+              res.json({"message" : "operation failed"});
           } else {
               console.log('spot_id as sent:' + req.body.spot_id);
               console.log('status as sent:' + req.body.status);
@@ -107,5 +107,20 @@ LIMIT 1`
           }
       });
   });
+
+  router.post("/users/profile/update",function(req,res){
+      var query = `UPDATE users SET name = '${req.body.name}', home_address = '${req.body.home_address}', work_address = '${req.body.work_address}', work_loc_id = '${req.body.work_loc_id}', home_loc_id = '${req.body.home_loc_id}'
+      WHERE user_id = '${req.body.user_id}'`;
+      // Updates a user's personal/profile information.
+      connection.query(query,function(err,rows){
+        if(err) {
+            console.log(colors.red(`updating ${req.body.user_id}'s profile failed...'`));
+            res.json({"message" : "operation failed"});
+        } else {
+            console.log(color.green(`${req.body.user_id}'s profile updated!'`));
+            res.json({"message" : "profile updated!"});
+        }
+  });
+});
 }
 module.exports = REST_ROUTER;
