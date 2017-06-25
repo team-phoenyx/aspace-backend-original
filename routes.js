@@ -108,8 +108,8 @@ LIMIT 1`
       });
   });
 
-  router.post("/users/profile/update",function(req,res){
-      var query = `UPDATE users SET name = '${req.body.name}', home_address = '${req.body.home_address}', work_address = '${req.body.work_address}', work_loc_id = '${req.body.work_loc_id}', home_loc_id = '${req.body.home_loc_id}'
+  router.post("/users/profile/update/",function(req,res){
+      var query = `UPDATE users SET name = '${req.body.name}', home_address = '${req.body.home_address}', work_address = '${req.body.work_address}', work_coords = '${req.body.work_coords}', home_coords = '${req.body.home_coords}'
       WHERE user_id = '${req.body.user_id}'`;
       // Updates a user's personal/profile information.
       connection.query(query,function(err,rows){
