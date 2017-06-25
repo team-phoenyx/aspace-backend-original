@@ -72,9 +72,9 @@ or
 //
 *endpoint*: **192.241.224.224:3000/api/users/profile/update/**
 *type*: POST
-*keys*: name, work_address, home_address, home_coords, work_coords, user_id
-*comment*: the addresses are for UI, while work_coords and home_coords are for map.
-Sample ID: 30
+*keys*: name, work_address, home_address, home_loc_id, work_loc_id, user_id
+*comment*: the addresses are for UI, while work_loc_id and home_loc_id are for map.
+*sample ID:* 30
 *sample output*:
   {
     "message": "profile updated!"
