@@ -117,7 +117,7 @@ LIMIT 1`
             console.log(colors.red(`updating ${req.body.user_id}'s profile failed...`));
             res.json({"message" : "operation failed"});
         } else {
-            console.log(color.green(`${req.body.user_id}'s profile updated!'`));
+            console.log(colors.green(`${req.body.user_id}'s profile updated!`));
             res.json({"message" : "profile updated!"});
         }
   });
