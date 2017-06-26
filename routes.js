@@ -110,11 +110,11 @@ LIMIT 1`
 
   router.post("/users/profile/update/",function(req,res){
       var query = `UPDATE users SET name = '${req.body.name}', home_address = '${req.body.home_address}', work_address = '${req.body.work_address}', work_loc_id = '${req.body.work_loc_id}', home_loc_id = '${req.body.home_loc_id}'
-      WHERE user_id = '${req.body.user_id}'`;
+      WHERE user_id = ${req.body.user_id}`;
       // Updates a user's personal/profile information.
       connection.query(query,function(err,rows){
         if(err) {
-            console.log(colors.red(`updating ${req.body.user_id}'s profile failed...'`));
+            console.log(colors.red(`updating ${req.body.user_id}'s profile failed...`));
             res.json({"message" : "operation failed"});
         } else {
             console.log(color.green(`${req.body.user_id}'s profile updated!'`));
