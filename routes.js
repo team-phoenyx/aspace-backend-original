@@ -4,6 +4,14 @@ const mysql = require("mysql");
 //var bcrypt = require("bcrypt");
 const request = require("request-promise");
 
+//TWILIO stuff
+const accountSid = 'AC7b77e08a33aadf7cad22329888e8a381';
+const authToken = '7e9a098a2c077de2e70aa1b5f8fee758';
+//
+const twilio = require('twilio')(accountSid, authToken);
+
+
+
 function REST_ROUTER(router,connection) {
     var self = this;
     self.handleRoutes(router,connection);
@@ -122,5 +130,67 @@ LIMIT 1`
         }
   });
 });
+
+router.post("/users/auth/verify/one/",function(req,res){
+    var randomPin = Math.floor(1000 + Math.random() * 9000);
+    var phoneNumber = '+13123456230';
+    var query = `
+    IF EXISTS (SELECT pin FROM users WHERE phone = '${req.body.phone}') THEN
+        UPDATE users SET pin = ${randomPin} WHERE phone = '${req.body.phone};'
+    ELSE
+        INSERT INTO users (pin, phone) VALUES (${randomPin}, '${req.body.phone}');
+        SELECT pin FROM users WHERE phone = '${req.body.phone};'
+    END IF`;
+    connection.query(query,function(err,rows){
+      if(err) {
+          console.log(err);
+          console.log(colors.red(`mobile auth with twilio failed... S1`));
+          res.json({"message" : "auth failed"});
+      } else {
+        client.messages
+          .create({
+            to: req.body.phone,
+            from: phoneNumber,
+            body: `Your ParCare authentication code is: ${randomPin}`
+          })
+          .then((message) => console.log(message.sid));
+          console.log(colors.green(`sending phone/pin to verify...`));
+          res.json(rows[0].pin);
+      }
+    });
+});
+
+router.post("/users/auth/verify/two/",function(req,res){
+    var query = `IF EXISTS (SELECT phone, pin FROM users WHERE phone = '${req.body.phone}' AND pin = ${req.body.pin})
+    BEGIN
+      SELECT access_token FROM users WHERE phone = '${req.body.phone}' AND pin = ${req.body.pin}
+    END`;
+    connection.query(query,function(err,rows){
+      if(err) {
+          console.log(colors.red(`mobile auth with twilio failed... S2`));
+          res.json({"message" : "auth failed"});
+      } else {
+          console.log(colors.green(`mobile auth with twilio succeeded!`));
+          res.json({"access_token" : rows[0].access_token});
+      }
+    });
+});
+
+router.post("/users/auth/verify/three/",function(req,res){
+    var query = `IF EXISTS (SELECT access_token FROM users WHERE phone = '${req.body.phone}')
+    BEGIN
+      SELECT user_id, name, work_address, work_loc_id, home_address, home_loc_id FROM users WHERE phone = '${req.body.phone}' AND access_token = '${req.body.access_token}'
+    END`;
+    connection.query(query,function(err,rows){
+      if(err) {
+          console.log(colors.red(`mobile auth with twilio failed... S3`));
+          res.json({"message" : "auth failed"});
+      } else {
+          console.log(colors.green(`user ${rows[0].user_id} logged in/registered!`));
+          res.json({"access_token" : rows[0].access_token});
+      }
+    });
+});
+
 }
 module.exports = REST_ROUTER;

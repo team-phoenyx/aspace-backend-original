@@ -13,12 +13,15 @@ function REST(){
 
 REST.prototype.connectMysql = function() {
     var self = this;
+    var server = '192.241.224.224';
+    var local = 'localhost';
     var pool      =    mysql.createPool({
         connectionLimit : 100,
-        host     : 'localhost',
+        host     : local,
         user     : 'avi',
         password : 'parcareavi158',
         database :  db,
+        timeout  : 1000,
         debug    :  false
     });
     pool.getConnection(function(err,connection){
