@@ -22,6 +22,7 @@ REST.prototype.connectMysql = function() {
         password : 'parcareavi158',
         database :  db,
         timeout  : 1000,
+        multipleStatements: true,
         debug    :  false
     });
     pool.getConnection(function(err,connection){

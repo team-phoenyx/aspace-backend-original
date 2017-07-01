@@ -80,3 +80,36 @@ or
     "message": "profile updated!"
   }
 //
+
+//
+*endpoint*: **192.241.224.224:3000/api/users/auth/verify/one/**
+*type*: POST
+*keys*: phone
+*comment*: uses phone to send SMS.
+*sample output*:
+  {
+    "pin": 9149,
+    "phone": "+14258026718"
+  }
+// **NOTE** Supplied phone number is mine.
+
+//
+*endpoint*: **192.241.224.224:3000/api/users/auth/verify/two/**
+*type*: POST
+*keys*: phone, pin
+*comment*: recieve access token if pin/phone match.
+*sample output*:
+  {
+    "access_token": null
+  }
+//
+
+//
+*endpoint*: **192.241.224.224:3000/api/users/auth/verify/two/**
+*type*: POST
+*keys*: access_token, phone
+*comment*: returns user data if access_token/phone match.
+*sample output*:
+Cannot be supplied as endpoint cannot be properly tested.
+Output would be similar to that of a single parking spot, but for a user.
+//
