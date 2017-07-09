@@ -74,7 +74,6 @@ or
 *type*: POST
 *keys*: name, work_address, home_address, home_loc_id, work_loc_id, user_id
 *comment*: the addresses are for UI, while work_loc_id and home_loc_id are for map.
-*sample ID:* 30
 *sample output*:
   {
     "message": "profile updated!"
@@ -82,34 +81,64 @@ or
 //
 
 //
-*endpoint*: **192.241.224.224:3000/api/users/auth/verify/one/**
+*endpoint*: **192.241.224.224:3000/api/users/profile/get/**
+*type*: POST
+*keys*: phone, access_token, user_id
+*comment*: the addresses are for UI, while work_loc_id and home_loc_id are for map.
+*sample output*:
+  {
+    "access_token" : "dgshrewhehegshgewet4ttsdghj",
+    "user_id" : "32t432rw236325135",
+    "home_address" : "31sdgkhelskdfds",
+    "home_loc_id" : "32r4532t52",
+    "work_address" : "31613531",
+    "work_loc_id" : "316531631",
+  }
+**NOTE:** Deviation from flow chart: standard time will not be sent, calculated serverside instead.
+//
+
+//
+*endpoint*: **192.241.224.224:3000/api/users/auth/pin/**
 *type*: POST
 *keys*: phone
 *comment*: uses phone to send SMS.
 *sample output*:
   {
-    "pin": 9149,
-    "phone": "+14258026718"
+    "resp_code" : "100"
+  }
+  or
+  {
+    "resp_code" : "1"
   }
 // **NOTE** Supplied phone number is mine.
 
 //
-*endpoint*: **192.241.224.224:3000/api/users/auth/verify/two/**
+*endpoint*: **192.241.224.224:3000/api/users/auth/verify/**
 *type*: POST
 *keys*: phone, pin
 *comment*: recieve access token if pin/phone match.
 *sample output*:
   {
-    "access_token": null
+    "access_token" : "dgshrewhehegshgewet4ttsdghj",
+    "user_id" : "32t432rw236325135",
+    "resp_code" : "101"
   }
 //
 
 //
-*endpoint*: **192.241.224.224:3000/api/users/auth/verify/two/**
+*endpoint*: **192.241.224.224:3000/api/users/auth/reauth/**
 *type*: POST
-*keys*: access_token, phone
-*comment*: returns user data if access_token/phone match.
+*keys*: access_token, phone, user_id
+*comment*: returns user data if access_token/phone/user_id match.
 *sample output*:
-Cannot be supplied as endpoint cannot be properly tested.
-Output would be similar to that of a single parking spot, but for a user.
+{
+  "resp_code" : "101"
+}
+or
+{
+  "resp_code" : "4"
+}
+{
+  "resp_code" : "5"
+}
 //

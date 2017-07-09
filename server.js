@@ -47,12 +47,12 @@ REST.prototype.configureExpress = function(connection) {
 
 REST.prototype.startServer = function() {
       app.listen(3000,function(){
-          console.log("PARCARE-API is live.");
+          console.log("ASPACE-API is live.");
       });
 }
 
 REST.prototype.stop = function(err) {
-    console.log("ERROR: " + err);
+    console.log(err);
     process.exit(1);
 }
 

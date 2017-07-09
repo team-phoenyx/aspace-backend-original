@@ -1,12 +1,12 @@
 {
-  "name": "PARCARE-API",
-  "version": "0.4.2",
+  "name": "ASPACE-API",
+  "version": "0.5.0",
   "scripts": {
     "start": "nodemon server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/fedorparetsky/ParCare.git"
+    "url": "git://avigloz@bitbucket.org/a-_/aspace-server.git"
   },
   "dependencies": {
     "body-parser": "1.12.4",

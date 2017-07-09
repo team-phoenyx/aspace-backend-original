@@ -2,6 +2,7 @@
 const colors = require("colors/safe");
 const mysql = require("mysql");
 const request = require("request-promise");
+const hat = require("hat");
 
 //TWILIO stuff
 const accountSid = 'AC7b77e08a33aadf7cad22329888e8a381';
@@ -84,38 +85,39 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
           }
     });
 });
-router.post("/spots/closest/",function(req,res){
-    var query = `SELECT open_spots.spot_id, open_spots.lat, open_spots.lon
-    FROM spots AS open_spots WHERE open_spots.status = 'F'
-    ORDER BY (POWER((open_spots.lon - ${req.body.lon}), 2.0) + POWER((open_spots.lat - ${req.body.lat}), 2.0))
-    LIMIT 1`
+    router.post("/spots/closest/",function(req,res){
+        var query = `SELECT open_spots.spot_id, open_spots.lat, open_spots.lon
+FROM spots AS open_spots WHERE open_spots.status = 'F'
+ORDER BY (POWER((open_spots.lon - ${req.body.lon}), 2.0) + POWER((open_spots.lat - ${req.body.lat}), 2.0))
+LIMIT 1`
     // Returns a single JSON object with the closest lat/lon to the destination.
-    connection.query(query,function(err,rows){
-      if(err) {
-          console.log(`dest. lat as sent: ${req.body.lat}\ndest. lon as sent: ${req.body.lon}`);
-          console.log(colors.red('operation failed...'));
-          res.json({"error" : "operation failed"});
-      } else {
-          var token = 'pk.eyJ1IjoicGFyY2FyZSIsImEiOiJjajN2cjU4MGkwMGE1MnFvN3cxOWY5azFlIn0.qmmgzy-RijWWqV-ZbmiZbg';
-            options = {
-              uri: `https://api.mapbox.com/directions/v5/mapbox/driving/${req.body.lon},${req.body.lat};${rows[0].lon},${rows[0].lat}?access_token=${token}`,
-              method: "GET"
-            };
-            request(options)
-            // send a GET request to the Mapbox API
-              .then (function(response){
-                var json = JSON.parse(response);
-                // parse the response into JSON
-                var route = json.routes[0];
-                console.log(`distance: ${route.distance} meters`);
-                res.json({"spot_id" : rows[0].spot_id, "lat" : rows[0].lat, "lon" : rows[0].lon, "distance" : route.distance});
-              })
-              .catch(function (err) {
+        connection.query(query,function(err,rows){
+            if(err) {
+                console.log(`dest. lat as sent: ${req.body.lat}\ndest. lon as sent: ${req.body.lon}`);
+                console.log(colors.red('operation failed...'));
+                res.json({"error" : "operation failed"});
+              } else {
+                var token = 'pk.eyJ1IjoicGFyY2FyZSIsImEiOiJjajN2cjU4MGkwMGE1MnFvN3cxOWY5azFlIn0.qmmgzy-RijWWqV-ZbmiZbg';
+                options = {
+                  uri: `https://api.mapbox.com/directions/v5/mapbox/driving/${req.body.lon},${req.body.lat};${rows[0].lon},${rows[0].lat}?access_token=${token}`,
+                  method: "GET"
+                };
+                request(options)
+                // send a GET request to the Mapbox API
+                .then (function(response){
+                  var json = JSON.parse(response);
+                  // parse the response into JSON
+                  var route = json.routes[0];
+                    console.log(`distance: ${route.distance} meters`);
+                    res.json({"spot_id" : rows[0].spot_id, "lat" : rows[0].lat, "lon" : rows[0].lon, "distance" : route.distance});
+                })
+                .catch(function (err) {
                 console.log(colors.red("error with Mapbox request."))
               })
           }
       });
   });
+
 
   router.post("/users/profile/update/",function(req,res){
       var query = `UPDATE users SET name = '${req.body.name}', home_address = '${req.body.home_address}', work_address = '${req.body.work_address}', work_loc_id = '${req.body.work_loc_id}', home_loc_id = '${req.body.home_loc_id}'
@@ -132,37 +134,58 @@ router.post("/spots/closest/",function(req,res){
   });
 });
 
-router.post("/users/auth/verify/one/",function(req,res){
+  router.post("/users/profile/get/",function(req,res){
+    var query = `SELECT home_loc_id, home_address, work_loc_id, work_address, name, user_id, access_token FROM users WHERE user_id = '${req.body.user_id}' AND access_token = '${req.body.access_token}' AND phone = '${req.body.phone}';`;
+    // Fetches user's entire profile (apart from a few irrelevant things)
+    connection.query(query,function(err,rows){
+      if(err) {
+          res.json({"resp_code" : "7"});
+      } else {
+          res.json(rows[0]);
+      }
+});
+});
+
+
+
+router.post("/users/auth/pin/",function(req,res){
     var randomPin = Math.floor(1000 + Math.random() * 9000);
     var query = `SELECT EXISTS(SELECT pin FROM users WHERE phone = '${req.body.phone}') as existsRecord`;
     connection.query(query,function(err,rows){
       if(err) {
           console.log(err);
-          console.log(colors.red(`mobile auth with twilio failed... S1`));
-          res.json({"message" : "auth failed s1"});
+          console.log(colors.red(`response code: 1`));
+          res.json({"resp_code" : "1"});
       } else {
             console.log(rows[0].existsRecord);
             if (rows[0].existsRecord == 1) {
-              var query = `UPDATE users SET pin = ${randomPin} WHERE phone = '${req.body.phone}';`;
-              //var select = `SELECT pin FROM \`users\` WHERE phone = '${req.body.phone}';`;
-              connection.query(query, function(err, rows){
-                if (err) throw err;
+              var date = Math.floor((new Date).getTime() / 1000);
+              console.log(date);
+              var queryUpdate = `UPDATE users SET pin = ${randomPin}, pin_timestamp = ${date} WHERE phone = '${req.body.phone}';`;
+              connection.query(queryUpdate, function(err, rows){
+                if (err) {
+                  //throw err;
+                  res.json({"resp_code" : "1"});
+                }
                 else {
                       sendText(req.body.phone, randomPin);
                       console.log(colors.green(`sending phone/pin to verify...`));
-                      res.json({pin : randomPin, phone : req.body.phone});
+                      res.json({"resp_code" : "100"});
                     }
                   });
                 }
             else if (rows[0].existsRecord == 0) {
-              var queryInsert = `INSERT INTO users (pin, phone) VALUES (${randomPin}, '${req.body.phone}');`;
-              //SELECT pin FROM \`users\` WHERE phone = '${req.body.phone}';`;
-              connection.query(queryInsert, function(err, rows){
-                if (err) throw err;
+              var date = Math.floor((new Date).getTime() / 1000);
+              var query = `INSERT INTO users (pin, phone, pin_timestamp) VALUES (${randomPin}, '${req.body.phone}', ${date});`;
+              connection.query(query, function(err, rows){
+                if (err) {
+                  //throw err;
+                  res.json({"resp_code" : "1"});
+                }
                 else{
-                      sendText(req.body.phoneNumber, randomPin);
+                      sendText(req.body.phone, randomPin);
                       console.log(colors.green(`sending phone/pin to verify...`));
-                      res.json({pin : randomPin, phone : req.body.phone});
+                      res.json({"resp_code" : "100"});
                       //connection.release();
                   }
                 });
@@ -171,65 +194,92 @@ router.post("/users/auth/verify/one/",function(req,res){
     });
 });
 
-router.post("/users/auth/verify/two/",function(req,res){
-    var query = `SELECT EXISTS(SELECT phone, pin FROM users WHERE phone = '${req.body.phone}' AND pin = ${req.body.pin}) as existsRecord;`;
+router.post("/users/auth/verify/",function(req,res){
+    // RECIEVE: PHONE/PIN
+    // SEND: access_token, user_id, response code/error code
+    var query = `SELECT pin, pin_timestamp FROM users WHERE phone = '${req.body.phone}';`;
+    //SELECT pin, pin_timestamp WHERE phone = '${req.body.phone}' as pinAndTime;
     connection.query(query,function(err,rows){
       if(err) {
           console.log(err);
-          console.log(colors.red(`mobile auth with twilio failed... S2`));
-          res.json({"message" : "auth failed s2"});
+          console.log(colors.red(`response code: 1`));
+          res.json({"resp_code" : "1"});
       } else {
-            console.log(rows[0].existsRecord);
-            if (rows[0].existsRecord == 1) {
-              var query = `SELECT access_token FROM users WHERE phone = '${req.body.phone}' AND pin = ${req.body.pin};`;
-              connection.query(query, function(err, rows){
-                if (err) throw err;
-                else {
-                  res.json({"access_token" : rows[0].access_token});
-                    }
-                  });
-                }
-            else if (rows[0].existsRecord == 0) {
-              console.log(colors.red("user does not exist"));
-              res.json({message: "user does not exist or info invalid..."});
+            var date = Math.floor((new Date).getTime() / 1000);
+            if (date - rows[0].pin_timestamp < 120) {
+              if (rows[0].pin != req.body.pin){
+                res.json({"resp_code" : "2"});
               }
+              else if (rows[0].pin == req.body.pin){
+                var token = hat();
+                var date = Math.floor((new Date).getTime() / 1000);
+                var query = `UPDATE users SET access_token = '${token}', token_timestamp = ${date} WHERE phone = '${req.body.phone}' AND pin = ${req.body.pin};
+SELECT name, user_id, access_token FROM users WHERE phone = '${req.body.phone}' AND pin = ${req.body.pin};`;
+                connection.query(query, function(err, rows){
+                  if (err){
+                    throw err;
+                    res.json({"resp_code" : "1"});
+                  }
+                  else {
+                    if (rows[1][0].name == null){
+                      res.json({access_token : `${rows[1][0].access_token}`, user_id : `${rows[1][0].user_id}`, resp_code : "101"});
+                    }
+                    else {
+                      res.json({access_token : `${rows[1][0].access_token}`, user_id : `${rows[1][0].user_id}`, resp_code : "102"});
+                    }
+                  }
+                });
+              }
+            }
+            else if (date - rows[0].pin_timestamp >= 120){
+                res.json({"resp_code" : "3"});
+            }
           }
     });
 });
 
-router.post("/users/auth/verify/three/",function(req,res){
-    var query = `SELECT EXISTS(SELECT access_token FROM users WHERE phone = '${req.body.phone}' AND access_token = '${req.body.access_token}') as existsRecord;`;
-    //var query = `SELECT user_id, name, work_address, work_loc_id, home_address, home_loc_id FROM users WHERE phone = '${req.body.phone}' AND access_token = '${req.body.access_token}';`;
-    connection.query(query,function(err,rows){
-      if(err) {
-          console.log(err);
-          console.log(colors.red(`mobile auth with twilio failed... S2`));
-          res.json({"message" : "auth failed s2"});
-      } else {
-            console.log(rows[0].existsRecord);
-            if (rows[0].existsRecord == 1) {
-              var query = `SELECT user_id, name, work_address, work_loc_id, home_address, home_loc_id FROM users WHERE phone = '${req.body.phone}' AND access_token = '${req.body.access_token}';`;
-              connection.query(query, function(err, rows){
-                if (err) throw err;
-                else {
-                  res.json(rows[0]);
-                    }
-                  });
-                }
-            else if (rows[0].existsRecord == 0) {
-              console.log(colors.red("user does not exist"));
-              res.json({message: "user does not exist or info invalid..."});
+router.post("/users/auth/reauth/",function(req,res){
+//     // RECIEVE: PHONE, USER_ID, access_token
+//     // SEND: response code (4: expired, 3: invalid, 101: success)
+var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
+connection.query(query,function(err,rows){
+  if(err) {
+      console.log(err);
+      console.log(colors.red(`response code: 1`));
+      res.json({"resp_code" : "1"});
+  } else {
+        if (rows[0].existsRecord == 1) {
+          var date = Math.floor((new Date).getTime() / 1000);
+          var query = `SELECT token_timestamp FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}';`;
+          connection.query(query, function(err, rows){
+            if (err) {
+              res.json({"resp_code" : "1"});
+            }
+            else {
+              if (date - rows[0].token_timestamp <= 7776000){
+                res.json({"resp_code" : "101"});
               }
+              else{
+                res.json({"resp_code" : "4"});
+              }
+            }
+          });
+        }
+        else if (rows[0].existsRecord == 0) {
+              res.json({"resp_code" : "5"})
           }
+      }
     });
 });
 }
+//
+
 function sendText(phone, pin){
   twilio.messages
       .create({
         to: phone,
         from: phoneNumber,
-        body: `Your ParCare authentication code is: ${pin}`
+        body: `aspace pin: ${pin}`
       })
        .then((message) => console.log(message.sid));
 }
