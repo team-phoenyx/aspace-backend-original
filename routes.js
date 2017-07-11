@@ -126,10 +126,10 @@ LIMIT 1`
       connection.query(query,function(err,rows){
         if(err) {
             console.log(colors.red(`updating ${req.body.user_id}'s profile failed...`));
-            res.json({"message" : "operation failed"});
+            res.json({"resp_code" : "6"});
         } else {
             console.log(colors.green(`${req.body.user_id}'s profile updated!`));
-            res.json({"message" : "profile updated!"});
+            res.json({"resp_code" : "100"});
         }
   });
 });
@@ -141,7 +141,13 @@ LIMIT 1`
       if(err) {
           res.json({"resp_code" : "7"});
       } else {
-          res.json(rows[0]);
+          if (Object.keys(rows[0]).length === 0 && rows[0].constructor === Object){
+            res.json({"resp_code" : "7"});
+          }
+          else{
+            res.json(rows[0]);
+          }
+
       }
 });
 });
@@ -250,14 +256,19 @@ connection.query(query,function(err,rows){
   } else {
         if (rows[0].existsRecord == 1) {
           var date = Math.floor((new Date).getTime() / 1000);
-          var query = `SELECT token_timestamp FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}';`;
+          var query = `SELECT token_timestamp, name FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}';`;
           connection.query(query, function(err, rows){
             if (err) {
               res.json({"resp_code" : "1"});
             }
             else {
               if (date - rows[0].token_timestamp <= 7776000){
-                res.json({"resp_code" : "101"});
+                if (rows[0].name == null){
+                  res.json({"resp_code" : "101"});
+                }
+                else{
+                  res.json({"resp_code" : "102"});
+                }
               }
               else{
                 res.json({"resp_code" : "4"});
