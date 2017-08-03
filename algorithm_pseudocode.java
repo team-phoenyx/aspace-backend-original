@@ -15,10 +15,29 @@ run() {
   //STEP 1 COMPLETE: spots now contains all the parking spots within the search radius
 
   //STEP 2: Sort the parking spots by sectors
+  List<Sector> sectors = new ArrayList<>(); //a sector is really just a list of parking spots with endpoint latlngs
   for (ParkingSpot spot : spots) { //foreach statement running throw all ParkingSpots in spots
-
+    //Check if the sectors list already has a sector containing the spot;
+    //if so, add the spot to the sector; if not, make a sector and add the spot to it
+    int sectorIndex = getIndexOfSectorContainingSpot(sectors, spot);
+    if (sectorIndex == -1) { //no existing sector contains the spot; make a new sector
+      sectors.add(new Sector(spot));
+    } else { //sector exists, and the index of the sector is in sectorIndex; add the spot to that sector in the list
+      sectors.get(sectorIndex).addSpot(spot); //only works if .get() returns a reference to the List, not a copy (e.g. Java)
+    }
   }
 
+  //STEP 3: 
+
+}
+
+int getIndexOfSectorContainingSpot(List<Sector> sectors, ParkingSpot spot) {
+  for (Sector sector : sectors) {
+    if (spot.sectorID == sector.id) { //the spot belongs to this sector
+      return sectors.indexOf(sector);
+    }
+  }
+  return -1; //spot doesn't belong to any of these existing sectors
 }
 
 //Gets the parking spots within the search radius of the destination
@@ -44,8 +63,8 @@ List<ParkingSpot> querySpots(LatLng destination, int radius) {
 
 //Gets the NE and SW of the bounding box around the search area (used to efficiently query the DB for possibly compatible parking spots)
 BoundingBox getSquareBoundingBox(LatLng origin, double distanceInYards) {
-  LatLng ne = inverseHaversine(origin, Math.sqrt(2 * distanceInYards * distanceInYards), 45);
-  LatLng sw = inverseHaversine(origin, Math.sqrt(2 * distanceInYards * distanceInYards), 225);
+  LatLng ne = inverseHaversine(origin, Math.sqrt(2 * distanceInYards * distanceInYards), 315); //bearing is counterclockwise from true north
+  LatLng sw = inverseHaversine(origin, Math.sqrt(2 * distanceInYards * distanceInYards), 135);
   return new BoundingBox(ne, sw);
 }
 
