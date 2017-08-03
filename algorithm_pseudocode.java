@@ -21,7 +21,7 @@ run() {
     //if so, add the spot to the sector; if not, make a sector and add the spot to it
     int sectorIndex = getIndexOfSectorContainingSpot(sectors, spot);
     if (sectorIndex == -1) { //no existing sector contains the spot; make a new sector
-      sectors.add(new Sector(spot));
+      sectors.add(new Sector(spot)); //also need to get the coords of the sector endpoints
     } else { //sector exists, and the index of the sector is in sectorIndex; add the spot to that sector in the list
       sectors.get(sectorIndex).addSpot(spot); //only works if .get() returns a reference to the List, not a copy (e.g. Java)
     }
@@ -43,7 +43,15 @@ run() {
   //now clusters contains at most 3 sectors that have more than 3 parking spots
 
   //STEP 4: Find shortest path through all sectors
-  //Call the server to get all edge costs
+  String requestString = mapboxAPIBaseURL + "directions-matrix/v1/mapbox/driving/";
+  for (Sector cluster : clusters) {
+      requestString += cluster.longitude + "," + cluster.latitude + ";"; //add the matrix parameters
+  }
+  requestString = requestString.substring(0, requestString.length() - 1); //shave off the last semicolon
+  requestString += ("?access_token=" + mapboxAccessToken);
+  int[][] costs = requestMapboxAPIWithURL(requestString); //some magic happening here, just request the server and get the 2-d array of costs from the json
+
+  
   //Dikjstras algorithm Magic
   //Return the route to the client
 
