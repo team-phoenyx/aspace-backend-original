@@ -42,7 +42,10 @@ run() {
   }
   //now clusters contains at most 3 sectors that have more than 3 parking spots
 
-  
+  //STEP 4: Find shortest path through all sectors
+  //Call the server to get all edge costs
+  //Dikjstras algorithm Magic
+  //Return the route to the client
 
 }
 
