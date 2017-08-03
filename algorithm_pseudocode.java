@@ -5,10 +5,10 @@ run() {
   List<ParkingSpot> spots;
   LatLng destination; //received in request
 
-  //STEP 1: Search radius calculation (basically radius starts at 100m, increases until number of parking spots in radius exceeds 30)
+  //STEP 1: Search radius calculation (basically radius starts at 100m, increases until number of AVAILABLE parking spots in radius exceeds 20)
   int radius = 100; //in meters
   spots = querySpots(destination, radius);
-  while (spots.size() < 30) {
+  while (spots.size() < 20) {
     radius += 50;
     spots = querySpots(destination, radius);
   }
@@ -27,7 +27,22 @@ run() {
     }
   }
 
-  //STEP 3: 
+  //STEP 3: Detect clusters in from the list of sectors
+  List<Sector> clusters = new ArrayList<>();
+  Collections.sort(sectors, new Comparator<Sector>() { //Order the entire sector list by the number of spots available.
+    public int compare (Sector s1, Sector s2) {
+      return Integer.compare(s1.getSpots().size(), s2.getSpots().size());
+    }
+  });
+
+  for (int i = 0; i < sectors.size(); i++) {
+    if (sectors.get(i).getSpots().size() < 3) { //since the list is sorted, the rest of the array should be less than 3 too.
+      if (i != 0) clusters = sectors.subList(0, Math.min(i - 1, 2)); //using Math.min to restrict to 3 clusters max
+    }
+  }
+  //now clusters contains at most 3 sectors that have more than 3 parking spots
+
+  
 
 }
 
@@ -49,7 +64,8 @@ List<ParkingSpot> querySpots(LatLng destination, int radius) {
     latitude > rawBBox.sw.latitude AND
     latitude < rawBBox.ne.latutude AND
     longitude > rawBBox.sw.longitude AND
-    longitude < rawBBox.ne.longitude); //THIS LINE IS VERY PSEUDO, implement the query however you like
+    longitude < rawBBox.ne.longitude AND
+    status = F); //THIS LINE IS VERY PSEUDO, implement the query however you like
 
   List<ParkingSpot> compatibleSpots = new ArrayList<>();
   //foreach statement running through every ParkingSpot in rawCompatibleSpots
