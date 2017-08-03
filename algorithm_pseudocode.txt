@@ -1,0 +1,24 @@
+ParkingSpot[] spots;
+LatLng destination;
+
+//STEP 1: Search radius calculation (basically radius starts at 100yds, increases until number of parking spots in radius exceeds 30)
+
+int radius = 100; //in yards
+spots = querySpots(destination, radius); //the query should find get the spots within the radius of the destination location (remember to use haversine's formula)
+while (spots.size < 30) {
+  radius += 50;
+  spots = querySpots(destination, radius);
+}
+
+func querySpots(LatLng destination, int radius) returns ParkingSpot[] {
+  //Get the spots from the database that are within a SQUARE bounding box
+  LatLng ne
+  ParkingSpot[] rawCompatibleSpots = *SELECT FROM spots WHERE
+}
+
+func getSquareBoundingBox(LatLng origin, int distanceInYards, int bearing) returns LatLng[2] {
+  lat2 = Math.toDegrees(Math.asin((Math.sin(lat1)) * (Math.cos(angdist)) + (Math.cos(lat1) * Math.sin(angdist) * Math.cos(theta))))
+  LatLng ne = inverseHaversine(origin, Math.sqrt(2 * distanceInYards * distanceInYards), )
+}
+
+//STEP 2: 
