@@ -27,7 +27,7 @@ REST.prototype.connectMysql = function() {
         host     : local,
         port     : 3306,
         user     : 'avi',
-        password : 'aspace-avi13579',
+        password : 'gCz%FpWxkDn6#bIw',
         database :  mysql_db,
         timeout  : 5000,
         multipleStatements: true,
