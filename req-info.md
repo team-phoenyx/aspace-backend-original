@@ -1,8 +1,8 @@
-Base URL for all endpoints: **192.241.224.224:3000/api/**
+Base URL for all endpoints: **138.68.241.101:3000/api/**
 **ALL KEYS/VALUES should be sent as x-www-form-urlencoded**
 
 //
-*endpoint*: **192.241.224.224:3000/api/spots/single/**
+*endpoint*: **138.68.241.101:3000/api/spots/single/**
 *type*: POST
 *keys*: spot_id (uid of the spot, i.e 007)
 
@@ -18,7 +18,7 @@ Base URL for all endpoints: **192.241.224.224:3000/api/**
 //
 
 //
-*endpoint*: **192.241.224.224:3000/api/spots/onscreen/**
+*endpoint*: **138.68.241.101:3000/api/spots/onscreen/**
 *type*: POST
 *keys*: lower_lat, lower_lon, upper_lat, upper_lon
 *comment*: Returns all the spots where:
@@ -38,7 +38,7 @@ lower_lat >= lat >= upper_lat
 //
 
 //
-*endpoint*: **192.241.224.224:3000/api/spots/status/**
+*endpoint*: **138.68.241.101:3000/api/spots/status/**
 *type*: POST
 *keys*: spot_id, status
 *comment*: status and spot_id are both of type varchar (String), and status
@@ -55,7 +55,7 @@ or
 //
 
 //
-*endpoint*: **192.241.224.224:3000/api/spots/closest/**
+*endpoint*: **138.68.241.101:3000/api/spots/closest/**
 *type*: POST
 *keys*: lat, lon
 *comment*: these values correspond to the destination's location.
@@ -70,7 +70,7 @@ or
 //
 
 //
-*endpoint*: **192.241.224.224:3000/api/users/profile/update/**
+*endpoint*: **138.68.241.101:3000/api/users/profile/update/**
 *type*: POST
 *keys*: name, work_address, home_address, home_loc_id, work_loc_id, user_id, phone
 *comment*: the addresses are for UI, while work_loc_id and home_loc_id are for map.
@@ -85,7 +85,7 @@ or
 //
 
 //
-*endpoint*: **192.241.224.224:3000/api/users/profile/get/**
+*endpoint*: **138.68.241.101:3000/api/users/profile/get/**
 *type*: POST
 *keys*: phone, access_token, user_id
 *comment*: the addresses are for UI, while work_loc_id and home_loc_id are for map.
@@ -98,11 +98,10 @@ or
     "work_address" : "31613531",
     "work_loc_id" : "316531631",
   }
-**NOTE:** Deviation from flow chart: standard time will not be sent, calculated serverside instead.
 //
 
 //
-*endpoint*: **192.241.224.224:3000/api/users/auth/pin/**
+*endpoint*: **138.68.241.101:3000/api/users/auth/pin/**
 *type*: POST
 *keys*: phone
 *comment*: uses phone to send SMS.
@@ -114,29 +113,28 @@ or
   {
     "resp_code" : "1"
   }
-// **NOTE** Supplied phone number is mine.
 
 //
-*endpoint*: **192.241.224.224:3000/api/users/auth/verify/**
+*endpoint*: **138.68.241.101:3000/api/users/auth/verify/**
 *type*: POST
 *keys*: phone, pin
 *comment*: recieve access token if pin/phone match.
 *sample output*:
   {
     "access_token" : "dgshrewhehegshgewet4ttsdghj",
-    "user_id" : "32t432rw236325135",
-    "resp_code" : "101"
+    "user_id" : "5",
+    "resp_code" : "100"
   }
 //
 
 //
-*endpoint*: **192.241.224.224:3000/api/users/auth/reauth/**
+*endpoint*: **138.68.241.101:3000/api/users/auth/reauth/**
 *type*: POST
 *keys*: access_token, phone, user_id
 *comment*: returns user data if access_token/phone/user_id match.
 *sample output*:
 {
-  "resp_code" : "101"
+  "resp_code" : "100"
 }
 or
 {
@@ -145,4 +143,100 @@ or
 {
   "resp_code" : "5"
 }
+//
+
+//
+*endpoint*: **138.68.241.101:3000/api/users/profile/cars/add/**
+*type*: POST
+*keys*: user_id, car_name, car_vin, car_make, car_model, car_length (in meters)
+*sample output*:
+  {
+    "resp_code" : "1"
+  }
+  or
+  a json object of the car that was added, including the `_id` which is important.
+//
+
+//
+*endpoint*: **138.68.241.101:3000/api/users/profile/cars/remove/**
+*type*: POST
+*keys*: `_id` (id of the car; ignore the ` `)
+*sample output*:
+  {
+    "resp_code" : "1"
+  }
+  or
+  {
+    "resp_code" : "100"
+  }
+//
+
+*endpoint*: **138.68.241.101:3000/api/users/profile/cars/update/**
+*type*: POST
+*keys*: same keys as */users/profile/cars/add/*
+*sample output*:
+  {
+    "resp_code" : "1"
+  }
+  or
+  a json object of the car that was updated, pretty much same as */users/profile/cars/add/*
+//
+
+*endpoint*: **138.68.241.101:3000/api/users/profile/cars/get/**
+*type*: POST
+*keys*: user_id
+*sample output*:
+  {
+    "resp_code" : "1"
+  }
+  or
+  a json array of every car the user has
+//
+
+//
+*endpoint*: **138.68.241.101:3000/api/users/profile/locs/add/**
+*type*: POST
+*keys*: user_id, address, location_id
+*sample output*:
+  {
+    "resp_code" : "1"
+  }
+  or
+  a json object of the location that was added, including the `_id` which is important.
+//
+
+//
+*endpoint*: **138.68.241.101:3000/api/users/profile/locs/remove/**
+*type*: POST
+*keys*: `_id` (id of the loc; ignore the ` `)
+*sample output*:
+  {
+    "resp_code" : "1"
+  }
+  or
+  {
+    "resp_code" : "100"
+  }
+//
+
+*endpoint*: **138.68.241.101:3000/api/users/profile/locs/update/**
+*type*: POST
+*keys*: same keys as */users/profile/locs/add/*
+*sample output*:
+  {
+    "resp_code" : "1"
+  }
+  or
+  a json object of the location that was updated, pretty much same as */users/profile/locs/add/*
+//
+
+*endpoint*: **138.68.241.101:3000/api/users/profile/locs/get/**
+*type*: POST
+*keys*: user_id
+*sample output*:
+  {
+    "resp_code" : "1"
+  }
+  or
+  a json array of every location a user has
 //
