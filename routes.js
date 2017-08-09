@@ -16,7 +16,7 @@ const phoneNumber = '+13123456230';
 //
 const twilio = require('twilio')(accountSid, authToken);
 
-
+// This comment is to test the Buddy pipeline.
 
 function REST_ROUTER(router,connection) {
     var self = this;
@@ -107,7 +107,7 @@ router.post("/users/profile/cars/add/",function(req,res){
         res.json({"resp_code" : "1"});
     } else {
           if (rows[0].existsRecord == 1) {
-            var new_car = new Cars({user_id : ${req.body.user_id}, car_name : `${req.body.car_name}`, car_vin : `${req.body.car_vin}`, car_make : `${req.body.car_make}`, car_model : `${req.body.car_model}`, car_length : `${req.body.car_length}`});
+            var new_car = new Cars({user_id : req.body.user_id, car_name : `${req.body.car_name}`, car_vin : `${req.body.car_vin}`, car_make : `${req.body.car_make}`, car_model : `${req.body.car_model}`, car_length : `${req.body.car_length}`});
             new_car.save(function(err, car) {
               if (err)
                 res.json({"resp_code" : "1"});
