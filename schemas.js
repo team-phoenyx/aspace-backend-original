@@ -11,6 +11,9 @@ var LocationSchema = new Schema({
   },
   location_id: {
     type: String
+  },
+  location_name: {
+    type: String
   }
 });
 

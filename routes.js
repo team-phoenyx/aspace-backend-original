@@ -36,7 +36,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
         // Select the entire JSON object corresponding to a spot_id
         connection.query(query,function(err,rows){
           if(err) {
-              res.json({"message" : "operation failed"});
+              res.json({"resp_code" : "1"});
           } else {
               res.json(rows[0]);
           }
@@ -48,7 +48,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
         // Select the entire JSON object for every spot within specific lat/lon bounds
         connection.query(query,function(err,rows){
           if(err) {
-              res.json({"message" : "operation failed"});
+              res.json({"resp_code" : "1"});
           } else {
               res.json(rows);
           }
@@ -60,12 +60,14 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
       // Updates the status of a spot with a given status (T = TAKEN; F = FREE) at a certain spot_id
         connection.query(query,function(err,rows){
           if(err) {
-              res.json({"message" : "operation failed"});
+              res.json({"resp_code" : "1"});
           } else {
               res.json({"status" : req.body.status});
           }
     });
 });
+/*
+END POINT DEPRECATED.
     router.post("/spots/closest/",function(req,res){
         var query = `SELECT open_spots.spot_id, open_spots.lat, open_spots.lon
 FROM spots AS open_spots WHERE open_spots.status = 'F'
@@ -95,8 +97,189 @@ LIMIT 1`
           }
       });
   });
+*/
 
+//CARS
+router.post("/users/profile/cars/add/",function(req,res){
+  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
+  connection.query(query,function(err,rows){
+    if(err) {
+        res.json({"resp_code" : "1"});
+    } else {
+          if (rows[0].existsRecord == 1) {
+            var new_car = new Cars({user_id : ${req.body.user_id}, car_name : `${req.body.car_name}`, car_vin : `${req.body.car_vin}`, car_make : `${req.body.car_make}`, car_model : `${req.body.car_model}`, car_length : `${req.body.car_length}`});
+            new_car.save(function(err, car) {
+              if (err)
+                res.json({"resp_code" : "1"});
+              else{
+                res.json({"resp_code" : "100"});
+              }
+            });
+          }
+          else if (rows[0].existsRecord == 0) {
+              res.json({"resp_code" : "1"})
+            }
+        }
+    });
+});
 
+router.post("/users/profile/cars/remove/",function(req,res){
+  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
+  connection.query(query,function(err,rows){
+    if(err) {
+        res.json({"resp_code" : "1"});
+    } else {
+          if (rows[0].existsRecord == 1) {
+            Cars.remove({"_id":req.body.car_id}, function(err, car) {
+              if (err)
+                res.json({"resp_code" : "1"});
+              else{
+                res.json({"resp_code" : "100"});
+              }
+            });
+          }
+          else if (rows[0].existsRecord == 0) {
+              res.json({"resp_code" : "1"})
+          }
+      }
+  });
+});
+
+router.post("/users/profile/cars/update/",function(req,res){
+  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
+  connection.query(query,function(err,rows){
+    if(err) {
+        res.json({"resp_code" : "1"});
+    } else {
+          if (rows[0].existsRecord == 1) {
+            Cars.findOneAndUpdate({"_id":req.body.car_id}, {car_name : `${req.body.car_name}`, car_vin : `${req.body.car_vin}`, car_make : `${req.body.car_make}`, car_model : `${req.body.car_model}`, car_length : `${req.body.car_length}`}, function(err, car) {
+              if (err)
+                res.json({"resp_code" : "1"});
+              else{
+                res.json({"resp_code" : "100"});
+              }
+            });
+          }
+          else if (rows[0].existsRecord == 0) {
+              res.json({"resp_code" : "1"})
+          }
+      }
+  });
+});
+
+router.post("/users/profile/cars/get/",function(req,res){
+  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
+  connection.query(query,function(err,rows){
+    if(err) {
+        res.json({"resp_code" : "1"});
+    } else {
+          if (rows[0].existsRecord == 1) {
+            Cars.find({"user_id":req.body.user_id}, function(err, carList) {
+              if (err)
+                res.json({"resp_code" : "1"});
+              else{
+                res.json(carList);
+              }
+            });
+          }
+          else if (rows[0].existsRecord == 0) {
+              res.json({"resp_code" : "1"})
+          }
+      }
+  });
+});
+//END CARS
+
+// LOCS
+router.post("/users/profile/locs/add/",function(req,res){
+  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
+  connection.query(query,function(err,rows){
+    if(err) {
+        res.json({"resp_code" : "1"});
+    } else {
+          if (rows[0].existsRecord == 1) {
+            var new_loc = new Locations({user_id : req.body.user_id, location_name : `${req.body.location_name}`, address : `${req.body.address}`, location_id: `${req.body.location_id}`});
+            new_loc.save(function(err, loc) {
+              if (err)
+                res.json({"resp_code" : "1"});
+              else{
+                res.json({"resp_code" : "100"});
+              }
+            });
+          }
+          else if (rows[0].existsRecord == 0) {
+              res.json({"resp_code" : "1"})
+            }
+        }
+    });
+});
+
+router.post("/users/profile/locs/remove/",function(req,res){
+  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
+  connection.query(query,function(err,rows){
+    if(err) {
+        res.json({"resp_code" : "1"});
+    } else {
+          if (rows[0].existsRecord == 1) {
+            Locations.remove({"_id":req.body.obj_id}, function(err, loc) {
+              if (err)
+                res.json({"resp_code" : "1"});
+              else{
+                res.json({"resp_code" : "100"});
+              }
+            });
+          }
+          else if (rows[0].existsRecord == 0) {
+              res.json({"resp_code" : "1"})
+          }
+      }
+  });
+});
+
+router.post("/users/profile/locs/update/",function(req,res){
+  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
+  connection.query(query,function(err,rows){
+    if(err) {
+        res.json({"resp_code" : "1"});
+    } else {
+          if (rows[0].existsRecord == 1) {
+            Locations.findOneAndUpdate({"_id":req.body.obj_id}, {location_name : `${req.body.location_name}`, address : `${req.body.address}`, location_id: `${req.body.location_id}`}, function(err, loc) {
+              if (err)
+                res.json({"resp_code" : "1"});
+              else{
+                res.json({"resp_code" : "100"});
+              }
+            });
+          }
+          else if (rows[0].existsRecord == 0) {
+              res.json({"resp_code" : "1"})
+          }
+      }
+  });
+});
+
+router.post("/users/profile/locs/get/",function(req,res){
+  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
+  connection.query(query,function(err,rows){
+    if(err) {
+        res.json({"resp_code" : "1"});
+    } else {
+          if (rows[0].existsRecord == 1) {
+            locs.find({"user_id":req.body.user_id}, function(err, locList) {
+              if (err)
+                res.json({"resp_code" : "1"});
+              else{
+                res.json(locList);
+              }
+            });
+          }
+          else if (rows[0].existsRecord == 0) {
+              res.json({"resp_code" : "1"})
+          }
+      }
+  });
+});
+// END LOCS
 router.post("/users/profile/update/",function(req,res){
     var query = `UPDATE users SET name = '${req.body.name}' WHERE user_id = '${req.body.user_id}' AND access_token = '${req.body.access_token}' AND phone = '${req.body.phone}';`;
     connection.query(query,function(err,rows){
@@ -107,92 +290,9 @@ router.post("/users/profile/update/",function(req,res){
       }
   });
 });
-//CARS
-router.post("/users/profile/cars/add/",function(req,res){
-  var new_car = new Cars(req.body);
-  new_car.save(function(err, car) {
-    if (err)
-      res.json({"resp_code" : "1"});
-    else{
-      res.json(car);
-    }
-  });
-});
 
-router.post("/users/profile/cars/remove/",function(req,res){
-  Cars.remove({"_id":req.body.car_id}, function(err, car) {
-    if (err)
-      res.json({"resp_code" : "1"});
-    else{
-      res.json({"resp_code" : "100"});
-    }
-  });
-});
-
-router.post("/users/profile/cars/update/",function(req,res){
-  Cars.findOneAndUpdate({"_id":req.body.car_id}, req.body, function(err, car) {
-    if (err)
-      res.json({"resp_code" : "1"});
-    else{
-      res.json(car);
-    }
-  });
-});
-
-router.post("/users/profile/cars/get/",function(req,res){
-  Cars.find({"user_id":req.body.user_id}, function(err, carList) {
-    if (err)
-      res.json({"resp_code" : "1"});
-    else{
-      res.json(carList);
-    }
-  });
-});
-//END CARS
-// LOCS
-router.post("/users/profile/locs/add/",function(req,res){
-  var new_loc = new Locations(req.body);
-  new_loc.save(function(err, loc) {
-    if (err)
-      res.json({"resp_code" : "1"});
-    else{
-      res.json(loc);
-    }
-  });
-});
-
-router.post("/users/profile/locs/remove/",function(req,res){
-  Locations.remove({"_id":req.body.loc_id}, function(err, loc) {
-    if (err)
-      res.json({"resp_code" : "1"});
-    else{
-      res.json({"resp_code" : "100"});
-    }
-  });
-});
-
-router.post("/users/profile/locs/update/",function(req,res){
-  Locations.findOneAndUpdate({"_id":req.body.loc_id}, req.body, function(err, loc) {
-    if (err)
-      res.json({"resp_code" : "1"});
-    else{
-      res.json(loc);
-    }
-  });
-});
-
-router.post("/users/profile/cars/get/",function(req,res){
-  Locations.find({"user_id":req.body.user_id}, function(err, locList) {
-    if (err)
-      res.json({"resp_code" : "1"});
-    else{
-      res.json(locList);
-    }
-  });
-});
-// END LOCS
-  router.post("/users/profile/get/",function(req,res){
-    var query = `SELECT name, user_id, access_token FROM users WHERE user_id = '${req.body.user_id}' AND access_token = '${req.body.access_token}' AND phone = '${req.body.phone}';`;
+router.post("/users/profile/get/",function(req,res){
+    var query = `SELECT name, user_id, access_token, phone FROM users WHERE user_id = '${req.body.user_id}' AND access_token = '${req.body.access_token}' AND phone = '${req.body.phone}';`;
     connection.query(query,function(err,rows){
       if(err) {
           res.json({"resp_code" : "7"});
@@ -207,8 +307,6 @@ router.post("/users/profile/cars/get/",function(req,res){
       }
   });
 });
-
-
 
 router.post("/users/auth/pin/",function(req,res){
     var randomPin = Math.floor(1000 + Math.random() * 9000);

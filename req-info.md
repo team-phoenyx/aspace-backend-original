@@ -1,4 +1,4 @@
-# **aspace API Documentation and References**
+**aspace API Documentation and References**
 ------
 
 #### Base URL for all endpoints: **138.68.241.101:3000/api/**
@@ -16,8 +16,8 @@ Gets data on a single spot given the spot_id
 **Response Format**:  
 ```
 {  
-  "id_type": "@@@",  
-  "id_num": "101",  
+  "sector_id" : "aCqgkSbhpWyublqGtvhaTrg",
+  "spot_id": "101",  
   "lat": 47.605416,  
   "lon": -122.300733,  
   "status": "T"  
@@ -40,8 +40,8 @@ Returns all spots where lower_lon >= lon >= upper_lon **and** lower_lat >= lat >
 ```
 [  
   {  
-    "id_type": "@@@",  
-    "id_num": "101",  
+    "sector_id" : "aCqgkSbhpWyublqGtvhaTrg",
+    "spot_id": "101",  
     "lat": 47.605416,  
     "lon": -122.300733,  
     "status": "T"  
@@ -68,25 +68,26 @@ or
     }
 **NOTE:** Returns the newly updated status if the operation succeeds.
 ---
-
-*endpoint*: **138.68.241.101:3000/api/spots/closest/**
+**DEPRECATED**
+<!-- *endpoint*: **138.68.241.101:3000/api/spots/closest/**
 *type*: POST
 *keys*: lat, lon
 *comment*: these values correspond to the destination's location.
 *sample output*:
   {
+      "sector_id" : "aCqgkSbhpWyublqGtvhaTrg",
       "spot_id": "7",
       "lat": 47.604327,
       "lon": -122.2987888,
       "distance": 3.2
   }
-**NOTE:** Returns physical location of the spot, and distance from destination in meters
+**NOTE:** Returns physical location of the spot, and distance from destination in meters. -->
+**DEPRECATED**
 ---
 
 *endpoint*: **138.68.241.101:3000/api/users/profile/update/**
 *type*: POST
-*keys*: name, work_address, home_address, home_loc_id, work_loc_id, user_id, phone
-*comment*: the addresses are for UI, while work_loc_id and home_loc_id are for map.
+*keys*: name, user_id, phone, access_token
 *sample output*:
   {
     "resp_code" : 100
@@ -100,7 +101,6 @@ or
 *endpoint*: **138.68.241.101:3000/api/users/profile/get/**
 *type*: POST
 *keys*: phone, access_token, user_id
-*comment*: the addresses are for UI, while work_loc_id and home_loc_id are for map.
 *sample output*:
   {
     "access_token" : "dgshrewhehegshgewet4ttsdghj",
@@ -136,6 +136,19 @@ or
     "user_id" : "5",
     "resp_code" : "100"
   }
+  or
+  {
+    "resp_code" : "1"
+  }
+  or
+  {
+    "resp_code" : "2"
+  }
+  or
+  {
+    "resp_code" : "3"
+  }
+
 ---
 
 *endpoint*: **138.68.241.101:3000/api/users/auth/reauth/**
@@ -154,21 +167,24 @@ or
   "resp_code" : "5"
 }
 ---
+##Cars
 
 *endpoint*: **138.68.241.101:3000/api/users/profile/cars/add/**
 *type*: POST
-*keys*: user_id, car_name, car_vin, car_make, car_model, car_length (in meters)
+*keys*: phone, access_token, user_id, car_name, car_vin, car_make, car_model, car_length (in meters)
 *sample output*:
+  {
+    "resp_code" : "100"
+  }
+  or
   {
     "resp_code" : "1"
   }
-  or
-  a json object of the car that was added, including the `_id` which is important.
 ---
 
 *endpoint*: **138.68.241.101:3000/api/users/profile/cars/remove/**
 *type*: POST
-*keys*: `_id` (id of the car; ignore the ` `)
+*keys*:  phone, access_token, user_id, obj_id
 *sample output*:
   {
     "resp_code" : "1"
@@ -187,12 +203,15 @@ or
     "resp_code" : "1"
   }
   or
-  a json object of the car that was updated, pretty much same as */users/profile/cars/add/*
+  {
+    "resp_code" : "100"
+  }
+
 ---
 
 *endpoint*: **138.68.241.101:3000/api/users/profile/cars/get/**
 *type*: POST
-*keys*: user_id
+*keys*: phone, access_token, user_id
 *sample output*:
   {
     "resp_code" : "1"
@@ -203,18 +222,20 @@ or
 
 *endpoint*: **138.68.241.101:3000/api/users/profile/locs/add/**
 *type*: POST
-*keys*: user_id, address, location_id
+*keys*:  phone, access_token, user_id, address, location_id, location_name
 *sample output*:
   {
     "resp_code" : "1"
   }
   or
-  a json object of the location that was added, including the `_id` which is important.
+  {
+    "resp_code" : "100"
+  }
 ---
 
 *endpoint*: **138.68.241.101:3000/api/users/profile/locs/remove/**
 *type*: POST
-*keys*: `_id` (id of the loc; ignore the ` `)
+*keys*:  phone, access_token, user_id, obj_id
 *sample output*:
   {
     "resp_code" : "1"
@@ -238,7 +259,7 @@ or
 
 *endpoint*: **138.68.241.101:3000/api/users/profile/locs/get/**
 *type*: POST
-*keys*: user_id
+*keys*: phone, access_token, user_id
 *sample output*:
   {
     "resp_code" : "1"
