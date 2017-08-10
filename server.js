@@ -15,8 +15,7 @@ function REST(){
 };
 
 REST.prototype.connectNoSQL = function (){
-  mongoose.Promise = global.Promise;
-  mongoose.createConnection('mongodb:/localhost/aspaceDB/', { useMongoClient: true });
+  mongoose.createConnection('mongodb://localhost/aspaceDB', { useMongoClient: true });
   console.log("MongoDB is connected!".random);
 }
 REST.prototype.connectMysql = function() {
