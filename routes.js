@@ -266,7 +266,7 @@ router.post("/users/profile/locs/get/",function(req,res){
         res.json({"resp_code" : "1"});
     } else {
           if (rows[0].existsRecord == 1) {
-            locs.find({"user_id":req.body.user_id}, function(err, locList) {
+            Locations.find({"user_id":req.body.user_id}, function(err, locList) {
               if (err)
                 res.json({"resp_code" : "1"});
               else{
