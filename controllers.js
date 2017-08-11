@@ -28,7 +28,7 @@ exports.SpotsSingle = function(req, res) {
         res.json(rows[0]);
     }
   });
-}
+};
 
 exports.SpotsOnscreen = function(req, res) {
   var query = `SELECT * FROM spots WHERE ((lat <= ${req.body.upper_lat}) AND (lat >= ${req.body.lower_lat})) AND ((lon <= ${req.body.upper_lon}) AND (lon >= ${req.body.lower_lon}))`;
@@ -40,7 +40,7 @@ exports.SpotsOnscreen = function(req, res) {
         res.json(rows);
     }
   });
-}
+};
 
 exports.SpotsStatus = function(req, res) {
   var query = `UPDATE spots SET status = '${req.body.status}' WHERE spot_id = '${req.body.spot_id}'`;
@@ -51,7 +51,7 @@ exports.SpotsStatus = function(req, res) {
         res.json({"status" : req.body.status});
     }
   });
-}
+};
 
 //
 
@@ -92,7 +92,7 @@ exports.AuthPin = function(req, res) {
             }
         }
     });
-}
+};
 
 exports.AuthVerify = function(req, res) {
   var query = `SELECT pin, pin_timestamp FROM users WHERE phone = '${req.body.phone}';`;
@@ -132,7 +132,7 @@ exports.AuthVerify = function(req, res) {
           }
         }
     });
-}
+};
 
 exports.AuthReauth = function(req, res) {
   var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
@@ -162,7 +162,7 @@ exports.AuthReauth = function(req, res) {
             }
         }
     });
-}
+};
 
 //
 
@@ -175,7 +175,7 @@ exports.ProfileUpdate = function(req, res) {
         res.json({"resp_code" : "100"});
     }
   });
-}
+};
 
 exports.ProfileGet = function(req, res) {
   var query = `SELECT name, user_id, access_token, phone FROM users WHERE user_id = '${req.body.user_id}' AND access_token = '${req.body.access_token}' AND phone = '${req.body.phone}';`;
@@ -191,7 +191,7 @@ exports.ProfileGet = function(req, res) {
         }
       }
   });
-}
+};
 
 //
 
@@ -216,7 +216,7 @@ exports.CarsAdd = function(req, res) {
             }
         }
     });
-}
+};
 
 exports.CarsRemove = function(req, res) {
   var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
@@ -238,7 +238,7 @@ exports.CarsRemove = function(req, res) {
           }
       }
   });
-}
+};
 
 exports.CarsUpdate = function(req, res) {
   var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
@@ -260,7 +260,7 @@ exports.CarsUpdate = function(req, res) {
           }
       }
   });
-}
+};
 
 exports.CarsGet = function(req, res) {
   var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
@@ -282,7 +282,7 @@ exports.CarsGet = function(req, res) {
           }
       }
   });
-}
+};
 
 //
 
@@ -310,7 +310,7 @@ exports.LocsAdd = function(req, res) {
             }
         }
     });
-}
+};
 
 exports.LocsRemove = function(req, res) {
   var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
@@ -332,7 +332,7 @@ exports.LocsRemove = function(req, res) {
           }
       }
   });
-}
+};
 
 exports.LocsUpdate = function(req, res) {
   var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
@@ -354,7 +354,7 @@ exports.LocsUpdate = function(req, res) {
           }
       }
   });
-}
+};
 
 exports.LocsGet = function(req, res) {
   var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
@@ -376,7 +376,7 @@ exports.LocsGet = function(req, res) {
           }
       }
   });
-}
+};
 
 //
 
