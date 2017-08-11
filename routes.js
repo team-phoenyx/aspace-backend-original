@@ -191,16 +191,19 @@ router.post("/users/profile/cars/get/",function(req,res){
 
 // LOCS
 router.post("/users/profile/locs/add/",function(req,res){
-  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.params.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
+  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
   connection.query(query,function(err,rows){
     if(err) {
         res.json({"resp_code" : "1"});
     } else {
           if (rows[0].existsRecord == 1) {
-            var new_loc = new Locations({user_id : req.params.user_id, location_name : `${req.params.location_name}`, address : `${req.params.address}`, location_id: `${req.params.location_id}`});
+            console.log("Query should now execute...");
+            var new_loc = new Locations({user_id : req.body.user_id, location_name : `${req.body.location_name}`, address : `${req.body.address}`, location_id: `${req.body.location_id}`});
             new_loc.save(function(err, loc) {
-              if (err)
+              console.log("Query has executed.");
+              if (err){
                 res.json({"resp_code" : "1"});
+              }
               else{
                 res.json({"resp_code" : "100"});
               }
