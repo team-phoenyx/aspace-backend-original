@@ -4,7 +4,7 @@ var express = require('express'),
     port = process.env.PORT || 3002,
     mongoose = require('mongoose'),
     mysql   = require("mysql"),
-    var colors = require("colors"),
+    colors = require("colors"),
     bodyParser = require('body-parser');
 
 var mysql_db = 'aspace';
