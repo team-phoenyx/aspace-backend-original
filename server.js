@@ -23,7 +23,7 @@ var server = '138.68.241.101';
 var local = 'localhost';
 
 var con = mysql.createConnection({
-  host: local;
+  host: local,
   user: "avi",
   password: "gCz%FpWxkDn6#bIw",
   database :  mysql_db,
