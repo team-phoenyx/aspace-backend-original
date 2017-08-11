@@ -191,7 +191,7 @@ router.post("/users/profile/cars/get/",function(req,res){
 
 // LOCS
 router.post("/users/profile/locs/add/",function(req,res){
-  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
+  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.params.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
   connection.query(query,function(err,rows){
     if(err) {
         res.json({"resp_code" : "1"});
