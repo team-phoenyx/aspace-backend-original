@@ -39,7 +39,7 @@ con.connect(function(err) {
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-var routes = require('routes.js');
+var routes = require("./routes.js");
 routes(app);
 
 app.listen(port);

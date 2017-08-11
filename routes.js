@@ -1,6 +1,6 @@
 'use strict';
 module.exports = function(app) {
-  var aspaceController = require("controllers.js");
+  var aspaceController = require("./controllers.js");
 
   //SPOTS
 
