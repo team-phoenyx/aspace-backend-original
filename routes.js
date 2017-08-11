@@ -16,8 +16,6 @@ const phoneNumber = '+13123456230';
 //
 const twilio = require('twilio')(accountSid, authToken);
 
-// This comment is to test the Buddy pipeline.
-// This comment is to initialize progress on the "dev" branch.
 
 function REST_ROUTER(router,connection) {
     var self = this;
@@ -199,7 +197,7 @@ router.post("/users/profile/locs/add/",function(req,res){
         res.json({"resp_code" : "1"});
     } else {
           if (rows[0].existsRecord == 1) {
-            var new_loc = new Locations({user_id : req.body.user_id, location_name : `${req.body.location_name}`, address : `${req.body.address}`, location_id: `${req.body.location_id}`});
+            var new_loc = new Locations({user_id : req.params.user_id, location_name : `${req.params.location_name}`, address : `${req.params.address}`, location_id: `${req.params.location_id}`});
             new_loc.save(function(err, loc) {
               if (err)
                 res.json({"resp_code" : "1"});
