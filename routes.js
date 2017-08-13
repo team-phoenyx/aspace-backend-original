@@ -21,7 +21,8 @@ module.exports = function(app) {
   app.route("/api/users/auth/verify/")
     .post(aspaceController.AuthVerify);
 
-  //app.route("/api/users/auth/reauth").post(aspaceController.AuthReath);
+  app.route("/api/users/auth/reauth")
+    .post(aspaceController.AuthReauth);
 
   // PROFILE (GET & UPDATE)
 
