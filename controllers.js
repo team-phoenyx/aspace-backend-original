@@ -133,7 +133,8 @@ exports.AuthReauth = function (req, res) {
       if (users.length == 1) {
         var date = Math.floor((new Date).getTime() / 1000);
 
-        if (date - users[0].token_timestamp <= 7776000) res.json({"resp_code" : "100"});
+        console.log(users);
+        if ((date - users[0].token_timestamp) <= 7776000) res.json({"resp_code" : "100"});
         else res.json({"resp_code" : "4"});
 
       } else if (users.length == 0) {
