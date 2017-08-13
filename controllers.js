@@ -263,7 +263,7 @@ exports.CarsUpdate = function(req, res) {
         return;
       }
       var newCar = {
-        _id: req.body.car_id;
+        _id: req.body.car_id,
         name: req.body.car_name,
         vin: req.body.car_vin,
         year: req.body.car_year,
