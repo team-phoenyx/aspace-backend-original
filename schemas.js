@@ -9,11 +9,12 @@ var LocationSchema = new Schema({
 });
 
 var CarSchema = new Schema({
-  car_name: String,
-  car_vin: String,
-  car_make: String,
-  car_model: String,
-  car_length: {
+  name: String,
+  vin: String,
+  year: Number,
+  make: String,
+  model: String,
+  length: {
     type: Number,
     default: 4.4
   }

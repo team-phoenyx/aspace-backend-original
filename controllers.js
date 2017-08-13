@@ -169,98 +169,131 @@ exports.ProfileGet = function(req, res) {
   });
 };
 
-//
+//Cars
 exports.CarsAdd = function(req, res) {
-  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
-  connection.query(query,function(err,rows){
-    if(err) {
-        res.json({"resp_code" : "1"});
-    } else {
-          if (rows[0].existsRecord == 1) {
-            var new_car = new Cars({user_id : req.body.user_id, car_name : req.body.car_name, car_vin : req.body.car_vin, car_make : req.body.car_make, car_model : req.body.car_model, car_length : req.body.car_length});
-            new_car.save(function(err, car) {
-              if (err)
-                res.json({"resp_code" : "1"});
-              else{
-                res.json({"resp_code" : "100"});
-              }
-            });
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null
+    || req.car_name == null || req.car_make == null || req.car_year == null || req.car_model == null || req.car_length == null) {
+    res.json({"resp_code": "1"});
+    return;
+  }
+
+  User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
+    if (err) res.json({"resp_code": "1"});
+    else {
+      var cars = user.cars
+      if (req.body.car_vin != "" && req.body.car_vin != null) { //if vin is provided, check for duplicate VINs
+        for (i = 0; i < cars.length; i++) {
+          if (cars[i].vin == req.body.car_vin) {
+            res.json({"resp_code": "8"});
+            return; //DUPLICATE CARS
           }
-          else if (rows[0].existsRecord == 0) {
-              res.json({"resp_code" : "1"})
-            }
         }
-    });
+      }
+      var newCar = {
+        name: req.body.car_name,
+        vin: req.body.car_vin,
+        year: req.body.car_year,
+        make: req.body.car_make,
+        model: req.body.car_model,
+        length: req.body.car_length
+      }
+      cars.push(newCar);
+      User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {cars: cars}, function (err, count, status) {
+        res.json({"resp_code": (err ? "1" : "100")});
+      });
+    }
+  });
 };
 
 exports.CarsRemove = function(req, res) {
-  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
-  connection.query(query,function(err,rows){
-    if(err) {
-        res.json({"resp_code" : "1"});
-    } else {
-          if (rows[0].existsRecord == 1) {
-            Cars.remove({"_id":req.body.car_id}, function(err, car) {
-              if (err)
-                res.json({"resp_code" : "1"});
-              else{
-                res.json({"resp_code" : "100"});
-              }
-            });
-          }
-          else if (rows[0].existsRecord == 0) {
-              res.json({"resp_code" : "1"})
-          }
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.car_id == null) {
+    res.json({"resp_code": "1"});
+    return;
+  }
+
+  User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
+    if (err) res.json({"resp_code" : "1"});
+    else {
+      var cars = user.cars;
+      var deleted = false;
+      for (i = 0; i < cars.length; i++) {
+        if (cars[i]._id == req.body.car_id) {
+          cars.splice(i, 1);
+          deleted = true;
+          break;
+        }
       }
+
+      if (!deleted) { //car to delete wasn't found
+        res.json({"resp_code": "1"});
+        return;
+      }
+
+      User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {cars: cars}, function (err, count, status) {
+        res.json({"resp_code": (err ? "1" : "100")});
+      });
+    }
   });
 };
 
 exports.CarsUpdate = function(req, res) {
-  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
-  connection.query(query,function(err,rows){
-    if(err) {
-        res.json({"resp_code" : "1"});
-    } else {
-          if (rows[0].existsRecord == 1) {
-            Cars.findOneAndUpdate({"_id":req.body.car_id}, {car_name : `${req.body.car_name}`, car_vin : `${req.body.car_vin}`, car_make : `${req.body.car_make}`, car_model : `${req.body.car_model}`, car_length : `${req.body.car_length}`}, function(err, car) {
-              if (err)
-                res.json({"resp_code" : "1"});
-              else{
-                res.json({"resp_code" : "100"});
-              }
-            });
-          }
-          else if (rows[0].existsRecord == 0) {
-              res.json({"resp_code" : "1"})
-          }
+
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null
+    || req.car_name == null || req.car_make == null || req.car_year == null || req.car_model == null || req.car_length == null || req.car_id) {
+    res.json({"resp_code": "1"});
+    return;
+  }
+
+  User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
+    if (err) res.json({"resp_code": "1"});
+    else {
+      var cars = user.cars;
+
+      var deleted = false;
+      for (i = 0; i < cars.length; i++) {
+        if (cars[i]._id == req.body.car_id) {
+          cars.splice(i, 1);
+          deleted = true;
+          break;
+        }
       }
+
+      if (!deleted) { //car to update wasn't found
+        res.json({"resp_code": "1"});
+        return;
+      }
+      var newCar = {
+        _id: req.body.car_id;
+        name: req.body.car_name,
+        vin: req.body.car_vin,
+        year: req.body.car_year,
+        make: req.body.car_make,
+        model: req.body.car_model,
+        length: req.body.car_length
+      }
+      cars.push(newCar);
+      User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {cars: cars}, function (err, count, status) {
+        res.json({"resp_code": (err ? "1" : "100")});
+      });
+    }
   });
 };
 
 exports.CarsGet = function(req, res) {
-  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = '${req.body.user_id}' AND access_token = '${req.body.access_token}') as existsRecord;`;
-  connection.query(query,function(err,rows){
-    if(err) {
-        res.json({"resp_code" : "1"});
-    } else {
-          if (rows[0].existsRecord == 1) {
-            Cars.find({user_id: req.body.user_id}, function(err, carList) {
-              if (err)
-                res.json({"resp_code" : "1"});
-              else{
-                res.json(carList);
-              }
-            });
-          }
-          else if (rows[0].existsRecord == 0) {
-              res.json({"resp_code" : "1"})
-          }
-      }
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null) {
+    res.json({"resp_code" : "1"});
+    return;
+  }
+
+  User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
+    if (err) res.json({"resp_code" : "1"});
+    else {
+      res.json(user.cars);
+    }
   });
 };
 
-//
-
+//Locations
 exports.LocsAdd = function(req, res) {
   var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
   connection.query(query,function(err,rows){
