@@ -8,8 +8,7 @@ const hat = require("hat");
 //mongodb stuff
 const models = require("./schemas.js");
 const mongoose = require("mongoose"),
-  Locations = mongoose.model('AspaceLocations'),
-  Cars = mongoose.model('AspaceCars');
+  User = mongoose.model('Users'),
 var connection = require("mysql");
 //TWILIO stuff
 const accountSid = 'AC7b77e08a33aadf7cad22329888e8a381';
@@ -56,7 +55,32 @@ exports.SpotsStatus = function(req, res) {
 //
 
 exports.AuthPin = function(req, res) {
-  var randomPin = Math.floor(1000 + Math.random() * 9000);
+  User.find({phone: req.body.phone}, function(err, user) {
+    if (err) res.json({"resp_code": "1"});
+    else {
+      var randomPin = Math.floor(1000 + Math.random() * 9000);
+      var date = Math.floor((new Date).getTime() / 1000);
+      if (user.size() == 1) { //returning user
+        User.update({phone: req.body.phone}, {pin: randomPin, pin_timestamp: date}, function (err, count, status) {
+          if (err) res.json({"resp_code": "1"});
+          else {
+            sendText(req.body.phone, randomPin);
+            res.json({"resp_code" : "100"});
+          }
+        });
+      } else if (user.size() == 0) { //new user
+        var newUser = new User({pin: randomPin, pin_timestamp: date, phone: req.body.phone});
+        newUser.save(function (err, user) {
+          if (err) res.json({"resp_code": "1"});
+          else {
+            sendText(req.body.phone, randomPin);
+            res.json({"resp_code" : "100"});
+          }
+        });
+      } else res.json({"resp_code": "1"}); //more than a single user w/ a phone number; should never happen
+    }
+  });
+
   var query = `SELECT EXISTS(SELECT pin FROM users WHERE phone = '${req.body.phone}') as existsRecord`;
   connection.query(query,function(err,rows){
     if(err) {
@@ -65,7 +89,7 @@ exports.AuthPin = function(req, res) {
     } else {
           console.log(rows[0].existsRecord);
           if (rows[0].existsRecord == 1) {
-            var date = Math.floor((new Date).getTime() / 1000);
+
             var queryUpdate = `UPDATE users SET pin = ${randomPin}, pin_timestamp = ${date} WHERE phone = '${req.body.phone}';`;
             connection.query(queryUpdate, function(err, rows){
               if (err) {
