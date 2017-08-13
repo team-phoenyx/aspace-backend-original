@@ -174,12 +174,15 @@ exports.CarsAdd = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null
     || req.car_name == null || req.car_make == null || req.car_year == null || req.car_model == null || req.car_length == null) {
     res.json({"resp_code": "1"});
+    console.log("missing params");
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code": "1"});
-    else {
+    if (err) {
+      res.json({"resp_code": "1"});
+      console.log("user not found");
+    } else {
       var cars = user.cars
       if (req.body.car_vin != "" && req.body.car_vin != null) { //if vin is provided, check for duplicate VINs
         for (i = 0; i < cars.length; i++) {
