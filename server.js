@@ -18,7 +18,7 @@ db.once('open', function () {
     console.log("MongoDB is connected!".random);
 });
 
-//MYSQL
+//MYSQL test
 var server = '138.68.241.101';
 var local = 'localhost';
 
