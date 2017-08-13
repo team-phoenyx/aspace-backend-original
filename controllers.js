@@ -52,8 +52,7 @@ exports.SpotsStatus = function(req, res) {
   });
 };
 
-//
-
+//AUTHENTICATION ENDPOINTS
 exports.AuthPin = function(req, res) {
   User.find({phone: req.body.phone}, function(err, user) {
     if (err) res.json({"resp_code": "1"});
@@ -81,91 +80,67 @@ exports.AuthPin = function(req, res) {
       } else res.json({"resp_code": "1"}); //more than a single user w/ a phone number; should never happen
     }
   });
-
-  /*
-  var query = `SELECT EXISTS(SELECT pin FROM users WHERE phone = '${req.body.phone}') as existsRecord`;
-  connection.query(query,function(err,rows){
-    if(err) {
-        console.log(colors.red(`response code: 1`));
-        res.json({"resp_code" : "1"});
-    } else {
-          console.log(rows[0].existsRecord);
-          if (rows[0].existsRecord == 1) {
-
-            var queryUpdate = `UPDATE users SET pin = ${randomPin}, pin_timestamp = ${date} WHERE phone = '${req.body.phone}';`;
-            connection.query(queryUpdate, function(err, rows){
-              if (err) {
-                res.json({"resp_code" : "1"});
-              }
-              else {
-                    sendText(req.body.phone, randomPin);
-                    res.json({"resp_code" : "100"});
-                  }
-                });
-              }
-          else if (rows[0].existsRecord == 0) {
-            var date = Math.floor((new Date).getTime() / 1000);
-            var query = `INSERT INTO users (pin, phone, pin_timestamp) VALUES (${randomPin}, '${req.body.phone}', ${date});`;
-            connection.query(query, function(err, rows){
-              if (err) {
-                res.json({"resp_code" : "1"});
-              }
-              else{
-                    sendText(req.body.phone, randomPin);
-                    res.json({"resp_code" : "100"});
-                }
-              });
-            }
-        }
-    });
-    */
 };
 
 exports.AuthVerify = function(req, res) {
-  /*
   User.findOne({phone: req.body.phone}, function (err, user) {
     if (err) res.json({"resp_code" : "1"});
     else {
+      var date = Math.floor((new Date).getTime() / 1000);
+      if (date - user.pin_timestamp < 120) {
+        if (user.pin != req.body.pin){
+          res.json({"resp_code" : "2"});
+        } else if (user.pin == req.body.pin) {
+          var token = hat();
 
+          User.update({phone: req.body.phone, pin: req.body.pin}, {access_token: token}, function (err, count, status) {
+            if (err) res.json({"resp_code": "1"});
+            else {
+              User.findOne({phone: req.body.phone, pin: req.body.pin}, function (err, user) {
+                if (err) res.json({"resp_code": "1"});
+                else {
+                  res.json({access_token : user.access_token, user_id : user._id, resp_code : (user.name == null ? "101" : "102")});
+                }
+              });
+            }
+          });
+
+          /*
+          var query = `UPDATE users SET access_token = '${token}', token_timestamp = ${date} WHERE phone = '${req.body.phone}' AND pin = ${req.body.pin};
+          SELECT name, user_id, access_token FROM users WHERE phone = '${req.body.phone}' AND pin = ${req.body.pin};`;
+          connection.query(query, function(err, rows){
+            if (err){
+              throw err;
+              res.json({"resp_code" : "1"});
+            }
+            else {
+              if (rows[1][0].name == null){
+                res.json({access_token : `${rows[1][0].access_token}`, user_id : `${rows[1][0].user_id}`, resp_code : "101"});
+              }
+              else {
+                res.json({access_token : `${rows[1][0].access_token}`, user_id : `${rows[1][0].user_id}`, resp_code : "102"});
+              }
+            }
+          });
+          */
+        }
+      }
+      else if (date - user.pin_timestamp >= 120) {
+          res.json({"resp_code" : "3"});
+      }
     }
-  })*/
+  });
+  /*
   var query = `SELECT pin, pin_timestamp FROM users WHERE phone = '${req.body.phone}';`;
   connection.query(query,function(err,rows){
     if(err) {
         console.log(colors.red(`response code: 1`));
         res.json({"resp_code" : "1"});
     } else {
-          var date = Math.floor((new Date).getTime() / 1000);
-          if (date - rows[0].pin_timestamp < 120) {
-            if (rows[0].pin != req.body.pin){
-              res.json({"resp_code" : "2"});
-            }
-            else if (rows[0].pin == req.body.pin){
-              var token = hat();
-              var date = Math.floor((new Date).getTime() / 1000);
-              var query = `UPDATE users SET access_token = '${token}', token_timestamp = ${date} WHERE phone = '${req.body.phone}' AND pin = ${req.body.pin};
-              SELECT name, user_id, access_token FROM users WHERE phone = '${req.body.phone}' AND pin = ${req.body.pin};`;
-              connection.query(query, function(err, rows){
-                if (err){
-                  throw err;
-                  res.json({"resp_code" : "1"});
-                }
-                else {
-                  if (rows[1][0].name == null){
-                    res.json({access_token : `${rows[1][0].access_token}`, user_id : `${rows[1][0].user_id}`, resp_code : "101"});
-                  }
-                  else {
-                    res.json({access_token : `${rows[1][0].access_token}`, user_id : `${rows[1][0].user_id}`, resp_code : "102"});
-                  }
-                }
-              });
-            }
-          }
-          else if (date - rows[0].pin_timestamp >= 120){
-              res.json({"resp_code" : "3"});
-          }
-        }
-    });
+
+    }
+  });
+  */
 };
 
 exports.AuthReauth = function(req, res) {
