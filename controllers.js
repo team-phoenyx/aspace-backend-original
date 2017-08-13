@@ -415,11 +415,14 @@ exports.LocsGet = function(req, res) {
 //
 
 function sendText(phone, pin){
-  twilio.messages
-      .create({
-        to: phone,
-        from: phoneNumber,
-        body: `aspace pin: ${pin}`
-      })
-       .then((message) => console.log(message.sid));
+  var opts = {
+    to: phone,
+    from: phoneNumber,
+    body: `aspace PIN: ${pin}`
+  };
+  console.log(opts);
+  twilio.messages.create(opts, function(err, msg) {
+    if (err) console.log(err);
+    console.log(msg);
+  });
 }
