@@ -172,9 +172,9 @@ exports.ProfileGet = function(req, res) {
 //Cars
 exports.CarsAdd = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null
-    || req.car_name == null || req.car_make == null || req.car_year == null || req.car_model == null || req.car_length == null) {
+    || req.body.car_name == null || req.body.car_make == null || req.body.car_year == null || req.body.car_model == null || req.body.car_length == null) {
     res.json({"resp_code": "1"});
-    console.log("missing params");
+    console.log(req.body);
     return;
   }
 
@@ -242,7 +242,7 @@ exports.CarsRemove = function(req, res) {
 exports.CarsUpdate = function(req, res) {
 
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null
-    || req.car_name == null || req.car_make == null || req.car_year == null || req.car_model == null || req.car_length == null || req.car_id) {
+    || req.body.car_name == null || req.body.car_make == null || req.body.car_year == null || req.body.car_model == null || req.body.car_length == null || req.body.car_id) {
     res.json({"resp_code": "1"});
     return;
   }
