@@ -202,7 +202,7 @@ exports.CarsAdd = function(req, res) {
         res.json({"resp_code" : "1"});
     } else {
           if (rows[0].existsRecord == 1) {
-            var new_car = new Cars({user_id : req.body.user_id, car_name : `${req.body.car_name}`, car_vin : `${req.body.car_vin}`, car_make : `${req.body.car_make}`, car_model : `${req.body.car_model}`, car_length : `${req.body.car_length}`});
+            var new_car = new Cars({user_id : req.body.user_id, car_name : req.body.car_name, car_vin : req.body.car_vin, car_make : req.body.car_make, car_model : req.body.car_model, car_length : req.body.car_length});
             new_car.save(function(err, car) {
               if (err)
                 res.json({"resp_code" : "1"});
@@ -263,13 +263,13 @@ exports.CarsUpdate = function(req, res) {
 };
 
 exports.CarsGet = function(req, res) {
-  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
+  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = '${req.body.user_id}' AND access_token = '${req.body.access_token}') as existsRecord;`;
   connection.query(query,function(err,rows){
     if(err) {
         res.json({"resp_code" : "1"});
     } else {
           if (rows[0].existsRecord == 1) {
-            Cars.find({"user_id":req.body.user_id}, function(err, carList) {
+            Cars.find({user_id: req.body.user_id}, function(err, carList) {
               if (err)
                 res.json({"resp_code" : "1"});
               else{
