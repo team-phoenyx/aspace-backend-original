@@ -133,7 +133,6 @@ exports.AuthReauth = function (req, res) {
       if (users.length == 1) {
         var date = Math.floor((new Date).getTime() / 1000);
 
-        console.log(users);
         if ((date - users[0].token_timestamp) <= 7776000) res.json({"resp_code" : "100"});
         else res.json({"resp_code" : "4"});
 
@@ -142,64 +141,31 @@ exports.AuthReauth = function (req, res) {
       } else res.json({"resp_code" : "1"});
     }
   });
-
-  /*
-  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
-  connection.query(query,function(err,rows){
-    if(err) {
-        res.json({"resp_code" : "1"});
-    } else {
-          if (rows[0].existsRecord == 1) {
-            var date = Math.floor((new Date).getTime() / 1000);
-            var query = `SELECT token_timestamp FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}';`;
-            connection.query(query, function(err, rows){
-              if (err) {
-                res.json({"resp_code" : "1"});
-              }
-              else {
-                if (date - rows[0].token_timestamp <= 7776000){
-                    res.json({"resp_code" : "100"});
-                }
-                else{
-                  res.json({"resp_code" : "4"});
-                }
-              }
-            });
-          }
-          else if (rows[0].existsRecord == 0) {
-                res.json({"resp_code" : "5"});
-            }
-        }
-    });
-    */
 };
 
-//
-
+//PROFILE ENDPOINTS
 exports.ProfileUpdate = function(req, res) {
-  var query = `UPDATE users SET name = '${req.body.name}' WHERE user_id = '${req.body.user_id}' AND access_token = '${req.body.access_token}' AND phone = '${req.body.phone}';`;
-  connection.query(query,function(err,rows){
-    if(err) {
-        res.json({"resp_code" : "6"});
-    } else {
-        res.json({"resp_code" : "100"});
-    }
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.name == null) {
+    res.json({"resp_code" : "1"});
+    return;
+  }
+
+  User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {name: req.body.name}, function (err, count, status) {
+    res.json({"resp_code": (err ? "6" : "100")});
   });
 };
 
 exports.ProfileGet = function(req, res) {
-  var query = `SELECT name, user_id, access_token, phone FROM users WHERE user_id = '${req.body.user_id}' AND access_token = '${req.body.access_token}' AND phone = '${req.body.phone}';`;
-  connection.query(query,function(err,rows){
-    if(err) {
-        res.json({"resp_code" : "7"});
-    } else {
-        if (Object.keys(rows[0]).length === 0 && rows[0].constructor === Object){
-          res.json({"resp_code" : "7"});
-        }
-        else{
-          res.json(rows[0]);
-        }
-      }
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null) {
+    res.json({"resp_code": "1"});
+    return;
+  }
+
+  User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function(err, user) {
+    if (err) res.json({"resp_code": "7"});
+    else {
+      res.json({"user_id": user._id, "name": user.name, "cars": user.cars, "locs": user.locs});
+    }
   });
 };
 
