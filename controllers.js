@@ -101,7 +101,7 @@ exports.AuthVerify = function(req, res) {
         } else if (user.pin == req.body.pin) {
           var token = hat();
 
-          User.update({phone: req.body.phone, pin: req.body.pin}, {access_token: token}, function (err, count, status) {
+          User.update({phone: req.body.phone, pin: req.body.pin}, {access_token: token, token_timestamp: date}, function (err, count, status) {
             if (err) res.json({"resp_code": "1"});
             else {
               User.findOne({phone: req.body.phone, pin: req.body.pin}, function (err, user) {
