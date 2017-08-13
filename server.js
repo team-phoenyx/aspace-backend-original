@@ -11,7 +11,7 @@ var mysql_db = 'aspace';
 
 //MONGODB
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/aspaceDB?ssl=true', { useMongoClient: true });
+mongoose.connect('mongodb://localhost/aspaceDB', { useMongoClient: true });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
