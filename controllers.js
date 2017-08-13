@@ -60,7 +60,7 @@ exports.AuthPin = function(req, res) {
     else {
       var randomPin = Math.floor(1000 + Math.random() * 9000);
       var date = Math.floor((new Date).getTime() / 1000);
-      if (user.size() == 1) { //returning user
+      if (user.toArray().length == 1) { //returning user
         User.update({phone: req.body.phone}, {pin: randomPin, pin_timestamp: date}, function (err, count, status) {
           if (err) res.json({"resp_code": "1"});
           else {
