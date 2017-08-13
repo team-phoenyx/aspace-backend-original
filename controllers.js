@@ -55,12 +55,13 @@ exports.SpotsStatus = function(req, res) {
 //
 
 exports.AuthPin = function(req, res) {
-  User.find({phone: req.body.phone}, function(err, user) {
+  User.find({phone: req.body.phone}).toArray(function(err, user) {
     if (err) res.json({"resp_code": "1"});
     else {
       var randomPin = Math.floor(1000 + Math.random() * 9000);
       var date = Math.floor((new Date).getTime() / 1000);
-      if (user.toArray().length == 1) { //returning user
+      console.log(user);
+      if (user.length == 1) { //returning user
         User.update({phone: req.body.phone}, {pin: randomPin, pin_timestamp: date}, function (err, count, status) {
           if (err) res.json({"resp_code": "1"});
           else {
@@ -68,7 +69,7 @@ exports.AuthPin = function(req, res) {
             res.json({"resp_code" : "100"});
           }
         });
-      } else if (user.size() == 0) { //new user
+      } else if (user.length == 0) { //new user
         var newUser = new User({pin: randomPin, pin_timestamp: date, phone: req.body.phone});
         newUser.save(function (err, user) {
           if (err) res.json({"resp_code": "1"});
