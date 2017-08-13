@@ -54,6 +54,10 @@ exports.SpotsStatus = function(req, res) {
 
 //AUTHENTICATION ENDPOINTS
 exports.AuthPin = function(req, res) {
+  if (req.body.phone == null || req.body.phone == "") {
+    res.json({"resp_code": "1"});
+    return;
+  }
   User.find({phone: req.body.phone}, function(err, user) {
     if (err) res.json({"resp_code": "1"});
     else {
