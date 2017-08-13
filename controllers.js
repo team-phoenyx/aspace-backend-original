@@ -8,7 +8,7 @@ const hat = require("hat");
 //mongodb stuff
 const models = require("./schemas.js");
 const mongoose = require("mongoose"),
-  User = mongoose.model('Users'),
+  User = mongoose.model('Users');
 var connection = require("mysql");
 //TWILIO stuff
 const accountSid = 'AC7b77e08a33aadf7cad22329888e8a381';
