@@ -185,7 +185,7 @@ exports.CarsAdd = function(req, res) {
     } else {
       var cars = user.cars
       if (req.body.car_vin != "" && req.body.car_vin != null) { //if vin is provided, check for duplicate VINs
-        for (i = 0; i < cars.length; i++) {
+        for (var i = 0; i < cars.length; i++) {
           if (cars[i].vin == req.body.car_vin) {
             res.json({"resp_code": "8"});
             return; //DUPLICATE CARS
@@ -219,7 +219,7 @@ exports.CarsRemove = function(req, res) {
     else {
       var cars = user.cars;
       var deleted = false;
-      for (i = 0; i < cars.length; i++) {
+      for (var i = 0; i < cars.length; i++) {
         if (cars[i]._id == req.body.car_id) {
           cars.splice(i, 1);
           deleted = true;
@@ -253,7 +253,7 @@ exports.CarsUpdate = function(req, res) {
       var cars = user.cars;
 
       var deleted = false;
-      for (i = 0; i < cars.length; i++) {
+      for (var i = 0; i < cars.length; i++) {
         if (cars[i]._id == req.body.car_id) {
           cars.splice(i, 1);
           deleted = true;
