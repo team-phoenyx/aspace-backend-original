@@ -81,6 +81,7 @@ exports.AuthPin = function(req, res) {
     }
   });
 
+  /*
   var query = `SELECT EXISTS(SELECT pin FROM users WHERE phone = '${req.body.phone}') as existsRecord`;
   connection.query(query,function(err,rows){
     if(err) {
@@ -116,6 +117,7 @@ exports.AuthPin = function(req, res) {
             }
         }
     });
+    */
 };
 
 exports.AuthVerify = function(req, res) {
