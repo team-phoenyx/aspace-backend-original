@@ -121,6 +121,13 @@ exports.AuthPin = function(req, res) {
 };
 
 exports.AuthVerify = function(req, res) {
+  /*
+  User.findOne({phone: req.body.phone}, function (err, user) {
+    if (err) res.json({"resp_code" : "1"});
+    else {
+
+    }
+  })*/
   var query = `SELECT pin, pin_timestamp FROM users WHERE phone = '${req.body.phone}';`;
   connection.query(query,function(err,rows){
     if(err) {
