@@ -164,13 +164,12 @@ exports.ProfileGet = function(req, res) {
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function(err, user) {
     if (err) res.json({"resp_code": "7"});
     else {
-      res.json({"user_id": user._id, "name": user.name, "cars": user.cars, "locs": user.locs});
+      res.json({"user_id": user._id, "name": user.name ? user.name : "", "cars": user.cars, "locs": user.locations});
     }
   });
 };
 
 //
-
 exports.CarsAdd = function(req, res) {
   var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
   connection.query(query,function(err,rows){
