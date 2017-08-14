@@ -47,3 +47,5 @@ var UserSchema = new Schema({
 });
 
 module.exports = mongoose.model('Users', UserSchema);
+module.exports = Car;
+module.exports = Location;

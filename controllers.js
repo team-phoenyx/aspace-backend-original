@@ -8,6 +8,8 @@ const hat = require("hat");
 //mongodb stuff
 const models = require("./schemas.js");
 const mongoose = require("mongoose"),
+  Car = mongoose.model('Car'),
+  Location = mongoose.model('Location'),
   User = mongoose.model('Users');
 var connection = require("mysql");
 //TWILIO stuff
@@ -192,15 +194,16 @@ exports.CarsAdd = function(req, res) {
           }
         }
       }
-      var newCar = {
+      var newCar = new Car({
         name: req.body.car_name,
         vin: req.body.car_vin,
         year: req.body.car_year,
         make: req.body.car_make,
         model: req.body.car_model,
         length: req.body.car_length
-      }
+      });
       cars.push(newCar);
+
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {cars: cars}, function (err, count, status) {
         res.json({"resp_code": (err ? "1" : "100")});
       });
