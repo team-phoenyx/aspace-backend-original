@@ -10,7 +10,8 @@ const models = require("./schemas.js");
 const mongoose = require("mongoose"),
   Car = mongoose.model('Car'),
   Location = mongoose.model('Location'),
-  User = mongoose.model('Users');
+  User = mongoose.model('Users'),
+  Spot = mongoose.model('Spots');
 var connection = require("mysql");
 //TWILIO stuff
 const accountSid = 'AC7b77e08a33aadf7cad22329888e8a381';
@@ -20,36 +21,43 @@ const phoneNumber = '+13123456230';
 const twilio = require('twilio')(accountSid, authToken);
 
 exports.SpotsSingle = function(req, res) {
-  var query = 'SELECT * FROM spots WHERE spot_id = ' + req.body.spot_id;
-  // Select the entire JSON object corresponding to a spot_id
-  connection.query(query,function(err,rows){
-    if(err) {
-        res.json({"resp_code" : "1"});
-    } else {
-        res.json(rows[0]);
+  if (req.body.spot_id == null) {
+    res.json({"resp_code": "1"});
+    return;
+  }
+
+  Spot.findOne({_id: req.body.spot_id}, function (err, spot) {
+    if (err) res.json({"resp_code": "1"});
+    else {
+      res.json(spot);
     }
   });
 };
 
 exports.SpotsOnscreen = function(req, res) {
-  var query = `SELECT * FROM spots WHERE ((lat <= ${req.body.upper_lat}) AND (lat >= ${req.body.lower_lat})) AND ((lon <= ${req.body.upper_lon}) AND (lon >= ${req.body.lower_lon}))`;
-  // Select the entire JSON object for every spot within specific lat/lon bounds
-  connection.query(query,function(err,rows){
-    if(err) {
-        res.json({"resp_code" : "1"});
-    } else {
-        res.json(rows);
+  if (req.body.upper_lat == null || req.body.lower_lat == null || req.body.upper_lon == null || req.body.lower_lon == null) {
+    res.json({"resp_code": "1"});
+    return;
+  }
+
+  Spot.find({lat: {$gte: req.body.lower_lat}, lat: {$lte: req.body.upper_lat}, lon: {$gte: req.body.lower_lon}, lon: {$lte: req.body.upper_lon}}, function (err, spots) {
+    if (err) res.json({"resp_code": "1"});
+    else {
+      res.json(spots);
     }
   });
 };
 
 exports.SpotsStatus = function(req, res) {
-  var query = `UPDATE spots SET status = '${req.body.status}' WHERE spot_id = '${req.body.spot_id}'`;
-  connection.query(query,function(err,rows){
-    if(err) {
-        res.json({"resp_code" : "1"});
-    } else {
-        res.json({"status" : req.body.status});
+  if (req.body.status == null || req.body.spot_id == null) {
+    res.json({"resp_code": "1"});
+    return;
+  }
+
+  Spot.update({_id: req.body.spot_id}, {status: req.body.status}, function (err, count, status) {
+    if (err) res.json({"resp_code": "1"});
+    else {
+      res.json({"resp_code": "100"});
     }
   });
 };

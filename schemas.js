@@ -2,6 +2,13 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+var SpotSchema = new Schema({
+  sector_id: String,
+  lat: Number,
+  lon: Number,
+  status: String
+});
+
 var LocationSchema = new Schema({
   address: String,
   loc_id: String,
@@ -34,6 +41,7 @@ var UserSchema = new Schema({
   cars: [CarSchema]
 });
 
+module.exports = mongoose.model('Spots', SpotsSchema);
 module.exports = mongoose.model('Users', UserSchema);
 module.exports = Car;
 module.exports = Location;
