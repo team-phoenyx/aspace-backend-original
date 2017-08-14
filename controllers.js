@@ -40,7 +40,7 @@ exports.SpotsOnscreen = function(req, res) {
     return;
   }
 
-  Spot.find({lat: {$gte: req.body.lower_lat, $lte: req.body.upper_lat}, lon: {$gte: req.body.lower_lon, $lte: req.body.upper_lon}, function (err, spots) {
+  Spot.find({lat: {$gte: req.body.lower_lat, $lte: req.body.upper_lat}, lon: {$gte: req.body.lower_lon, $lte: req.body.upper_lon}}, function (err, spots) {
     if (err) res.json({"resp_code": "1"});
     else {
       res.json(spots);
