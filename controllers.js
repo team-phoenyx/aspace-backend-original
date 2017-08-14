@@ -244,41 +244,34 @@ exports.CarsRemove = function(req, res) {
 
 exports.CarsUpdate = function(req, res) {
 
-  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null
-    || req.body.car_name == null || req.body.car_make == null || req.body.car_year == null || req.body.car_model == null || req.body.car_length == null || req.body.car_id) {
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.car_name == null || req.body.car_make == null || req.body.car_year == null || req.body.car_model == null || req.body.car_length == null || req.body.car_id == null) {
     res.json({"resp_code": "1"});
+    console.log("params not fulfilled");
+
+    console.log(req.body);
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code": "1"});
+    if (err) {
+      res.json({"resp_code": "1"});
+      console.log("can't find user");
+    }
     else {
       var cars = user.cars;
 
-      var deleted = false;
       for (var i = 0; i < cars.length; i++) {
         if (cars[i]._id == req.body.car_id) {
-          cars.splice(i, 1);
-          deleted = true;
+          cars[i].name = req.body.car_name;
+          cars[i].vin = req.body.car_vin;
+          cars[i].year = req.body.car_year;
+          cars[i].make = req.body.car_make;
+          cars[i].model = req.body.car_model;
+          cars[i].length = req.body.car_length;
           break;
         }
       }
 
-      if (!deleted) { //car to update wasn't found
-        res.json({"resp_code": "1"});
-        return;
-      }
-      var newCar = new Car({
-        _id: req.body.car_id,
-        name: req.body.car_name,
-        vin: req.body.car_vin,
-        year: req.body.car_year,
-        make: req.body.car_make,
-        model: req.body.car_model,
-        length: req.body.car_length
-      });
-      
-      cars.push(newCar);
       console.log(cars);
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {cars: cars}, function (err, count, status) {
         res.json({"resp_code": (err ? "1" : "100")});
@@ -296,7 +289,6 @@ exports.CarsGet = function(req, res) {
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
     if (err) res.json({"resp_code" : "1"});
     else {
-      console.log(user);
       res.json(user.cars);
     }
   });
