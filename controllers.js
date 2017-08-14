@@ -278,6 +278,7 @@ exports.CarsUpdate = function(req, res) {
         length: req.body.car_length
       }
       cars.push(newCar);
+      console.log(cars);
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {cars: cars}, function (err, count, status) {
         res.json({"resp_code": (err ? "1" : "100")});
       });
@@ -294,6 +295,7 @@ exports.CarsGet = function(req, res) {
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
     if (err) res.json({"resp_code" : "1"});
     else {
+      console.log(user);
       res.json(user.cars);
     }
   });
