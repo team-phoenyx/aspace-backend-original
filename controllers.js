@@ -268,7 +268,7 @@ exports.CarsUpdate = function(req, res) {
         res.json({"resp_code": "1"});
         return;
       }
-      var newCar = {
+      var newCar = new Car({
         _id: req.body.car_id,
         name: req.body.car_name,
         vin: req.body.car_vin,
@@ -276,7 +276,8 @@ exports.CarsUpdate = function(req, res) {
         make: req.body.car_make,
         model: req.body.car_model,
         length: req.body.car_length
-      }
+      });
+      
       cars.push(newCar);
       console.log(cars);
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {cars: cars}, function (err, count, status) {
