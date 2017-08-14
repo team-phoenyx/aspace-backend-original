@@ -3,9 +3,9 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var LocationSchema = new Schema({
-  loc_address: String,
+  address: String,
   loc_id: String,
-  loc_name: String
+  name: String
 });
 
 var CarSchema = new Schema({
