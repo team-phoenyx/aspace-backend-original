@@ -62,6 +62,27 @@ exports.SpotsStatus = function(req, res) {
   });
 };
 
+exports.SpotsAdd = function(req, res) {
+  if (req.body.lat == null || req.body.lon == null) {
+    res.json({"resp_code": "1"});
+    return;
+  }
+
+  var newSpot = new Spot({status: (req.body.status ? req.body.status : "F"), lat: req.body.lat, lon: req.body.lon});
+  newSpot.save(function (err, spot) {
+    res.json({"resp_code": (err ? "1" : "100")});
+  });
+}
+
+exports.SpotsGetAll = function(req, res) {
+  Spot.find({}, function (err, spots) {
+    if (err) res.json({"resp_code": "1"});
+    else {
+      res.json(spots);
+    }
+  });
+}
+
 //AUTHENTICATION ENDPOINTS
 exports.AuthPin = function(req, res) {
   if (req.body.phone == null || req.body.phone == "") {
