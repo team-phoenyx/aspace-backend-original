@@ -334,6 +334,7 @@ exports.LocsRemove = function(req, res) {
       var locs = user.locations;
       var deleted = false;
       for (var i = 0; i < locs.length; i++) {
+        console.log("db id: " + locs[i].loc_id + "; req_id: " + req.body.loc_id);
         if (locs[i].loc_id == req.body.loc_id) {
           locs.splice(i, 1);
           deleted = true;
