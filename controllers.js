@@ -307,7 +307,7 @@ exports.LocsAdd = function(req, res) {
       console.log("user not found");
     } else {
       var locs = user.locations;
-      for (var i = 0; i < cars.length; i++) { //check for location duplicates
+      for (var i = 0; i < locs.length; i++) { //check for location duplicates
         if (locs[i].loc_id == req.body.loc_id) {
           res.json({"resp_code": "8"});
           return; //DUPLICATE LOCATIONS
@@ -319,7 +319,7 @@ exports.LocsAdd = function(req, res) {
         loc_id: req.body.loc_id
       });
       locs.push(newLoc);
-
+      console.log(locs);
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {locations: locs}, function (err, count, status) {
         res.json({"resp_code": (err ? "1" : "100")});
       });
@@ -399,6 +399,7 @@ exports.LocsGet = function(req, res) {
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
     if (err) res.json({"resp_code" : "1"});
     else {
+      console.log(user.locations);
       res.json(user.locations);
     }
   });
