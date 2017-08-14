@@ -286,15 +286,12 @@ exports.CarsGet = function(req, res) {
 exports.LocsAdd = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null || req.body.loc_address == null || req.body.loc_name == null) {
     res.json({"resp_code": "1"});
-    console.log(req.body);
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) {
-      res.json({"resp_code": "1"});
-      console.log("user not found");
-    } else {
+    if (err) res.json({"resp_code": "1"});
+    else {
       var locs = user.locations;
       for (var i = 0; i < locs.length; i++) { //check for location duplicates
         if (locs[i].loc_id == req.body.loc_id) {
@@ -308,7 +305,6 @@ exports.LocsAdd = function(req, res) {
         loc_id: req.body.loc_id
       });
       locs.push(newLoc);
-      console.log(locs);
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {locations: locs}, function (err, count, status) {
         res.json({"resp_code": (err ? "1" : "100")});
       });
@@ -319,22 +315,15 @@ exports.LocsAdd = function(req, res) {
 exports.LocsRemove = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null) {
     res.json({"resp_code": "1"});
-    console.log("params not fulfilled");
-
-    console.log(req.body);
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) {
-      console.log("cant find user");
-      res.json({"resp_code" : "1"});
-    }
+    if (err) res.json({"resp_code" : "1"});
     else {
       var locs = user.locations;
       var deleted = false;
       for (var i = 0; i < locs.length; i++) {
-        console.log("db id: " + locs[i].loc_id + "; req_id: " + req.body.loc_id);
         if (locs[i].loc_id == req.body.loc_id) {
           locs.splice(i, 1);
           deleted = true;
@@ -344,7 +333,6 @@ exports.LocsRemove = function(req, res) {
 
       if (!deleted) { //loc to delete wasn't found
         res.json({"resp_code": "1"});
-        console.log("can't find loc to delete");
         return;
       }
 
@@ -358,17 +346,12 @@ exports.LocsRemove = function(req, res) {
 exports.LocsUpdate = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null || req.body.loc_address == null || req.body.loc_name == null) {
     res.json({"resp_code": "1"});
-    console.log("params not fulfilled");
-
-    console.log(req.body);
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) {
-      res.json({"resp_code": "1"});
-      console.log("can't find user");
-    } else {
+    if (err) res.json({"resp_code": "1"});
+    else {
       var locs = user.locations;
 
       for (var i = 0; i < locs.length; i++) {
@@ -379,7 +362,6 @@ exports.LocsUpdate = function(req, res) {
         }
       }
 
-      console.log(locs);
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {locations: locs}, function (err, count, status) {
         res.json({"resp_code": (err ? "1" : "100")});
       });
@@ -396,7 +378,6 @@ exports.LocsGet = function(req, res) {
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
     if (err) res.json({"resp_code" : "1"});
     else {
-      console.log(user.locations);
       res.json(user.locations);
     }
   });

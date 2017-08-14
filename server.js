@@ -1,7 +1,7 @@
 'use strict';
 var express = require('express'),
     app = express(),
-    port = process.env.PORT || 3005,
+    port = process.env.PORT || 3002,
     mongoose = require('mongoose'),
     mysql   = require("mysql"),
     colors = require("colors"),
