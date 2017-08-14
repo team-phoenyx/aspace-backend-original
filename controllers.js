@@ -243,7 +243,6 @@ exports.CarsRemove = function(req, res) {
 };
 
 exports.CarsUpdate = function(req, res) {
-
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.car_name == null || req.body.car_make == null || req.body.car_year == null || req.body.car_model == null || req.body.car_length == null || req.body.car_id == null) {
     res.json({"resp_code": "1"});
     console.log("params not fulfilled");
@@ -296,100 +295,117 @@ exports.CarsGet = function(req, res) {
 
 //Locations
 exports.LocsAdd = function(req, res) {
-  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
-  connection.query(query,function(err,rows){
-    if(err) {
-        res.json({"resp_code" : "1"});
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null || req.body.loc_address == null || req.body.loc_name == null) {
+    res.json({"resp_code": "1"});
+    console.log(req.body);
+    return;
+  }
+
+  User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
+    if (err) {
+      res.json({"resp_code": "1"});
+      console.log("user not found");
     } else {
-          if (rows[0].existsRecord == 1) {
-            console.log("Query should now execute...");
-            var new_loc = new Locations({user_id : req.body.user_id, location_name : `${req.body.location_name}`, address : `${req.body.address}`, location_id: `${req.body.location_id}`});
-            new_loc.save(function(err, loc) {
-              console.log("Query has executed.");
-              if (err){
-                res.json({"resp_code" : "1"});
-              }
-              else{
-                res.json({"resp_code" : "100"});
-              }
-            });
-          }
-          else if (rows[0].existsRecord == 0) {
-              res.json({"resp_code" : "1"})
-            }
+      var locs = user.locations;
+      for (var i = 0; i < cars.length; i++) { //check for location duplicates
+        if (locs[i].loc_id == req.body.loc_id) {
+          res.json({"resp_code": "8"});
+          return; //DUPLICATE LOCATIONS
         }
-    });
+      }
+      var newLoc = new Location({
+        name: req.body.loc_name,
+        address: req.body.loc_address,
+        loc_id: req.body.loc_id
+      });
+      locs.push(newLoc);
+
+      User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {locations: locs}, function (err, count, status) {
+        res.json({"resp_code": (err ? "1" : "100")});
+      });
+    }
+  });
 };
 
 exports.LocsRemove = function(req, res) {
-  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
-  connection.query(query,function(err,rows){
-    if(err) {
-        res.json({"resp_code" : "1"});
-    } else {
-          if (rows[0].existsRecord == 1) {
-            Locations.remove({"_id":req.body.obj_id}, function(err, loc) {
-              if (err)
-                res.json({"resp_code" : "1"});
-              else{
-                res.json({"resp_code" : "100"});
-              }
-            });
-          }
-          else if (rows[0].existsRecord == 0) {
-              res.json({"resp_code" : "1"})
-          }
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null) {
+    res.json({"resp_code": "1"});
+    return;
+  }
+
+  User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
+    if (err) res.json({"resp_code" : "1"});
+    else {
+      var locs = user.locations;
+      var deleted = false;
+      for (var i = 0; i < locs.length; i++) {
+        if (locs[i].loc_id == req.body.loc_id) {
+          locs.splice(i, 1);
+          deleted = true;
+          break;
+        }
       }
+
+      if (!deleted) { //loc to delete wasn't found
+        res.json({"resp_code": "1"});
+        return;
+      }
+
+      User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {locations: locs}, function (err, count, status) {
+        res.json({"resp_code": (err ? "1" : "100")});
+      });
+    }
   });
 };
 
 exports.LocsUpdate = function(req, res) {
-  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
-  connection.query(query,function(err,rows){
-    if(err) {
-        res.json({"resp_code" : "1"});
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null || req.body.loc_address == null || req.body.loc_name == null) {
+    res.json({"resp_code": "1"});
+    console.log("params not fulfilled");
+
+    console.log(req.body);
+    return;
+  }
+
+  User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
+    if (err) {
+      res.json({"resp_code": "1"});
+      console.log("can't find user");
     } else {
-          if (rows[0].existsRecord == 1) {
-            Locations.findOneAndUpdate({"_id":req.body.obj_id}, {location_name : `${req.body.location_name}`, address : `${req.body.address}`, location_id: `${req.body.location_id}`}, function(err, loc) {
-              if (err)
-                res.json({"resp_code" : "1"});
-              else{
-                res.json({"resp_code" : "100"});
-              }
-            });
-          }
-          else if (rows[0].existsRecord == 0) {
-              res.json({"resp_code" : "1"})
-          }
+      var locs = user.locations;
+
+      for (var i = 0; i < locs.length; i++) {
+        if (locs[i].loc_id == req.body.loc_id) {
+          locs[i].name = req.body.loc_name;
+          locs[i].address = req.body.loc_address;
+          break;
+        }
       }
+
+      console.log(locs);
+      User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {locations: locs}, function (err, count, status) {
+        res.json({"resp_code": (err ? "1" : "100")});
+      });
+    }
   });
 };
 
 exports.LocsGet = function(req, res) {
-  var query = `SELECT EXISTS(SELECT * FROM users WHERE phone = '${req.body.phone}' AND user_id = ${req.body.user_id} AND access_token = '${req.body.access_token}') as existsRecord;`;
-  connection.query(query,function(err,rows){
-    if(err) {
-        res.json({"resp_code" : "1"});
-    } else {
-          if (rows[0].existsRecord == 1) {
-            Locations.find({"user_id":req.body.user_id}, function(err, locList) {
-              if (err)
-                res.json({"resp_code" : "1"});
-              else{
-                res.json(locList);
-              }
-            });
-          }
-          else if (rows[0].existsRecord == 0) {
-              res.json({"resp_code" : "1"})
-          }
-      }
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null) {
+    res.json({"resp_code" : "1"});
+    return;
+  }
+
+  User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
+    if (err) res.json({"resp_code" : "1"});
+    else {
+      res.json(user.locations);
+    }
   });
 };
 
 //
-
-function sendText(phone, pin){
+function sendText(phone, pin) {
   var opts = {
     to: phone,
     from: phoneNumber,
