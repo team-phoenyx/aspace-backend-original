@@ -68,7 +68,7 @@ exports.SpotsAdd = function(req, res) {
     return;
   }
 
-  var newSpot = new Spot({status: (req.body.status ? req.body.status : "F"), lat: req.body.lat, lon: req.body.lon});
+  var newSpot = new Spot({status: (req.body.status ? req.body.status : "F"), lat: req.body.lat, lon: req.body.lon, sector_id: req.body.sector_id});
   newSpot.save(function (err, spot) {
     res.json({"resp_code": (err ? "1" : "100")});
   });
