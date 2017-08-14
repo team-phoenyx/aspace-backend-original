@@ -65,7 +65,6 @@ exports.AuthPin = function(req, res) {
     else {
       var randomPin = Math.floor(1000 + Math.random() * 9000);
       var date = Math.floor((new Date).getTime() / 1000);
-      console.log(user);
       if (user.length == 1) { //returning user
         User.update({phone: req.body.phone}, {pin: randomPin, pin_timestamp: date}, function (err, count, status) {
           if (err) res.json({"resp_code": "1"});
@@ -176,15 +175,12 @@ exports.CarsAdd = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null
     || req.body.car_name == null || req.body.car_make == null || req.body.car_year == null || req.body.car_model == null || req.body.car_length == null) {
     res.json({"resp_code": "1"});
-    console.log(req.body);
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) {
-      res.json({"resp_code": "1"});
-      console.log("user not found");
-    } else {
+    if (err) res.json({"resp_code": "1"});
+    else {
       var cars = user.cars
       if (req.body.car_vin != "" && req.body.car_vin != null) { //if vin is provided, check for duplicate VINs
         for (var i = 0; i < cars.length; i++) {
@@ -245,17 +241,11 @@ exports.CarsRemove = function(req, res) {
 exports.CarsUpdate = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.car_name == null || req.body.car_make == null || req.body.car_year == null || req.body.car_model == null || req.body.car_length == null || req.body.car_id == null) {
     res.json({"resp_code": "1"});
-    console.log("params not fulfilled");
-
-    console.log(req.body);
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) {
-      res.json({"resp_code": "1"});
-      console.log("can't find user");
-    }
+    if (err) res.json({"resp_code": "1"});
     else {
       var cars = user.cars;
 
@@ -271,7 +261,6 @@ exports.CarsUpdate = function(req, res) {
         }
       }
 
-      console.log(cars);
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {cars: cars}, function (err, count, status) {
         res.json({"resp_code": (err ? "1" : "100")});
       });
@@ -330,11 +319,17 @@ exports.LocsAdd = function(req, res) {
 exports.LocsRemove = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null) {
     res.json({"resp_code": "1"});
+    console.log("params not fulfilled");
+
+    console.log(req.body);
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code" : "1"});
+    if (err) {
+      console.log("cant find user");
+      res.json({"resp_code" : "1"});
+    }
     else {
       var locs = user.locations;
       var deleted = false;
@@ -348,6 +343,7 @@ exports.LocsRemove = function(req, res) {
 
       if (!deleted) { //loc to delete wasn't found
         res.json({"resp_code": "1"});
+        console.log("can't find loc to delete");
         return;
       }
 
@@ -412,7 +408,6 @@ function sendText(phone, pin) {
     from: phoneNumber,
     body: `aspace PIN: ${pin}`
   };
-  console.log(opts);
   twilio.messages.create(opts, function(err, msg) {
     if (err) console.log(err);
     console.log(msg);
