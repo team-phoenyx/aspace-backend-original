@@ -30,20 +30,8 @@ var UserSchema = new Schema({
   pin: Number,
   pin_timestamp: Number,
   name: String,
-  locations: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: Location,
-      default: null
-    }
-  ],
-  cars: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: Car,
-      default: null
-    }
-  ]
+  locations: [LocationSchema],
+  cars: [CarSchema]
 });
 
 module.exports = mongoose.model('Users', UserSchema);
