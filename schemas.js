@@ -41,7 +41,7 @@ var UserSchema = new Schema({
   cars: [CarSchema]
 });
 
-module.exports = mongoose.model('Spots', SpotsSchema);
+module.exports = mongoose.model('Spots', SpotSchema);
 module.exports = mongoose.model('Users', UserSchema);
 module.exports = Car;
 module.exports = Location;
