@@ -1,47 +1,50 @@
 'use strict';
+
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+var SpotSchema = new Schema({
+  sector_id: String,
+  lat: Number,
+  lon: Number,
+  status: String
+});
+
 var LocationSchema = new Schema({
-  user_id: {
-    type: Number
-  },
-  address: {
-    type: String
-  },
-  location_id: {
-    type: String
-  },
-  location_name: {
-    type: String
-  }
+  address: String,
+  loc_id: String, //separate from auto-generated _id
+  name: String
 });
 
 var CarSchema = new Schema({
-  user_id: {
-    type: Number
-  },
-  car_name: {
-    type: String,
-    default: "My Car"
-  },
-  car_vin: {
-    type: String,
-    default: "My VIN"
-  },
-  car_make:{
-    type: String,
-    default: "My make"
-  },
-  car_model:{
-    type: String,
-    default: "My Model"
-  },
-  car_length:{
+  name: String,
+  vin: String,
+  year: Number,
+  make: String,
+  model: String,
+  length: {
     type: Number,
-    default: 3
+    default: 4.4 //Default car length
   }
 });
 
-module.exports = mongoose.model('AspaceLocations', LocationSchema);
-module.exports = mongoose.model('AspaceCars', CarSchema);
+var Location = mongoose.model('Location', LocationSchema);
+var Car = mongoose.model('Car', CarSchema);
+
+var UserSchema = new Schema({
+  phone: Number,
+  access_token: String,
+  token_timestamp: Number,
+  pin: Number,
+  pin_timestamp: Number,
+  name: String,
+  locations: [LocationSchema],
+  cars: [CarSchema]
+});
+
+module.exports = mongoose.model('Spots', SpotSchema);
+module.exports = mongoose.model('Users', UserSchema);
+module.exports = Car;
+module.exports = Location;
+
+/* Copyright © 2017 Avi Glozman and Terrance Li */
