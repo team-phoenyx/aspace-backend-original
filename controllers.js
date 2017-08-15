@@ -76,7 +76,7 @@ exports.SpotsAdd = function(req, res) {
 }
 
 exports.SpotsGetAll = function(req, res) {
-  Spot.find([], function (err, spots) {
+  Spot.find({}, function (err, spots) {
     if (err) res.json({"resp_code": "1"}, {"resp_msg": "Spots.find failed: " + err});
     else {
       res.json(spots);
