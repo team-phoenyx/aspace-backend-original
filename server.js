@@ -43,4 +43,6 @@ var routes = require("./routes.js");
 routes(app);
 
 app.listen(port);
-console.log("ASPACE-API is live.");
+console.log("ASPACE-API (DEV) is live.");
+
+/* Copyright © 2017 Avi Glozman*/
