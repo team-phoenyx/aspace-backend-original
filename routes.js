@@ -2,8 +2,7 @@
 module.exports = function(app) {
   var aspaceController = require("./controllers.js");
 
-  //SPOTS
-
+  //SPOTS ENDPOINTS
   app.route("/api/spots/single")
     .post(aspaceController.SpotsSingle);
 
@@ -19,8 +18,7 @@ module.exports = function(app) {
   app.route("/api/spots/getall")
     .post(aspaceController.SpotsGetAll);
 
-  //AUTH
-
+  //AUTH ENDPOINTS
   app.route("/api/users/auth/pin")
     .post(aspaceController.AuthPin);
 
@@ -30,16 +28,14 @@ module.exports = function(app) {
   app.route("/api/users/auth/reauth")
     .post(aspaceController.AuthReauth);
 
-  // PROFILE (GET & UPDATE)
-
+  //PROFILE ENDPOINTS
   app.route("/api/users/profile/update")
     .post(aspaceController.ProfileUpdate);
 
   app.route("/api/users/profile/get")
     .post(aspaceController.ProfileGet);
 
-  // PROFILE (CARS)
-
+  //Profile cars
   app.route("/api/users/profile/cars/add")
     .post(aspaceController.CarsAdd);
 
@@ -52,8 +48,7 @@ module.exports = function(app) {
   app.route("/api/users/profile/cars/get")
     .post(aspaceController.CarsGet);
 
-  // PROFILE (LOCS)
-
+  //Profile locations
   app.route("/api/users/profile/locs/add")
     .post(aspaceController.LocsAdd);
 
@@ -65,5 +60,6 @@ module.exports = function(app) {
 
   app.route("/api/users/profile/locs/get")
     .post(aspaceController.LocsGet);
-
 }
+
+/* Copyright © 2017 Avi Glozman and Terrance Li */

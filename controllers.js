@@ -22,12 +22,12 @@ const twilio = require('twilio')(accountSid, authToken);
 
 exports.SpotsSingle = function(req, res) {
   if (req.body.spot_id == null) {
-    res.json({"resp_code": "1"});
+    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
     return;
   }
 
   Spot.findOne({_id: req.body.spot_id}, function (err, spot) {
-    if (err) res.json({"resp_code": "1"});
+    if (err) res.json({"resp_code": "1"}, {"resp_msg": "Spots.findOne failed: " + err});
     else {
       res.json(spot);
     }
@@ -36,12 +36,12 @@ exports.SpotsSingle = function(req, res) {
 
 exports.SpotsOnscreen = function(req, res) {
   if (req.body.upper_lat == null || req.body.lower_lat == null || req.body.upper_lon == null || req.body.lower_lon == null) {
-    res.json({"resp_code": "1"});
+    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
     return;
   }
 
   Spot.find({lat: {$gte: req.body.lower_lat, $lte: req.body.upper_lat}, lon: {$gte: req.body.lower_lon, $lte: req.body.upper_lon}}, function (err, spots) {
-    if (err) res.json({"resp_code": "1"});
+    if (err) res.json({"resp_code": "1"}, {"resp_msg": "Spots.find failed: " + err});
     else {
       res.json(spots);
     }
@@ -50,12 +50,12 @@ exports.SpotsOnscreen = function(req, res) {
 
 exports.SpotsStatus = function(req, res) {
   if (req.body.status == null || req.body.spot_id == null) {
-    res.json({"resp_code": "1"});
+    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
     return;
   }
 
   Spot.update({_id: req.body.spot_id}, {status: req.body.status}, function (err, count, status) {
-    if (err) res.json({"resp_code": "1"});
+    if (err) res.json({"resp_code": "1"}, {"resp_msg": "Spots.update failed: " + err});
     else {
       res.json({"resp_code": "100"});
     }
@@ -64,19 +64,19 @@ exports.SpotsStatus = function(req, res) {
 
 exports.SpotsAdd = function(req, res) {
   if (req.body.lat == null || req.body.lon == null) {
-    res.json({"resp_code": "1"});
+    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
     return;
   }
 
   var newSpot = new Spot({status: (req.body.status ? req.body.status : "F"), lat: req.body.lat, lon: req.body.lon, sector_id: req.body.sector_id});
   newSpot.save(function (err, spot) {
-    res.json({"resp_code": (err ? "1" : "100")});
+    res.json({"resp_code": (err ? "1" : "100")}, (err ? {"resp_msg": "Spot.save failed: " + err} : null));
   });
 }
 
 exports.SpotsGetAll = function(req, res) {
   Spot.find({}, function (err, spots) {
-    if (err) res.json({"resp_code": "1"});
+    if (err) res.json({"resp_code": "1"}, {"resp_msg": "Spots.find failed: " + err});
     else {
       res.json(spots);
     }
@@ -86,17 +86,17 @@ exports.SpotsGetAll = function(req, res) {
 //AUTHENTICATION ENDPOINTS
 exports.AuthPin = function(req, res) {
   if (req.body.phone == null || req.body.phone == "") {
-    res.json({"resp_code": "1"});
+    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
     return;
   }
   User.find({phone: req.body.phone}, function(err, user) {
-    if (err) res.json({"resp_code": "1"});
+    if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.find failed: " + err});
     else {
       var randomPin = Math.floor(1000 + Math.random() * 9000);
       var date = Math.floor((new Date).getTime() / 1000);
       if (user.length == 1) { //returning user
         User.update({phone: req.body.phone}, {pin: randomPin, pin_timestamp: date}, function (err, count, status) {
-          if (err) res.json({"resp_code": "1"});
+          if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.update failed: " + err});
           else {
             sendText(req.body.phone, randomPin);
             res.json({"resp_code" : "100"});
@@ -105,24 +105,24 @@ exports.AuthPin = function(req, res) {
       } else if (user.length == 0) { //new user
         var newUser = new User({pin: randomPin, pin_timestamp: date, phone: req.body.phone});
         newUser.save(function (err, user) {
-          if (err) res.json({"resp_code": "1"});
+          if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.save failed: " + err});
           else {
             sendText(req.body.phone, randomPin);
             res.json({"resp_code" : "100"});
           }
         });
-      } else res.json({"resp_code": "1"}); //more than a single user w/ a phone number; should never happen
+      } else res.json({"resp_code": "1"}, {"resp_msg": "CRITICAL: More than a single user with this phone"}); //more than a single user w/ a phone number; should never happen
     }
   });
 };
 
 exports.AuthVerify = function(req, res) {
   if (req.body.phone == null || req.body.phone == "") {
-    res.json({"resp_code" : "1"});
+    res.json({"resp_code" : "1"}, {"resp_msg": "Invalid/empty parameters"});
     return;
   }
   User.findOne({phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code" : "1"});
+    if (err) res.json({"resp_code" : "1"}, {"resp_msg": "User.findOne failed: " + err});
     else {
       var date = Math.floor((new Date).getTime() / 1000);
       if (date - user.pin_timestamp < 120) {
@@ -132,10 +132,10 @@ exports.AuthVerify = function(req, res) {
           var token = hat();
 
           User.update({phone: req.body.phone, pin: req.body.pin}, {access_token: token, token_timestamp: date}, function (err, count, status) {
-            if (err) res.json({"resp_code": "1"});
+            if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.update failed: " + err});
             else {
               User.findOne({phone: req.body.phone, pin: req.body.pin}, function (err, user) {
-                if (err) res.json({"resp_code": "1"});
+                if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.findOne failed: " + err});
                 else {
                   res.json({access_token : user.access_token, user_id : user._id, resp_code : (user.name == null ? "101" : "102")});
                 }
@@ -153,12 +153,12 @@ exports.AuthVerify = function(req, res) {
 
 exports.AuthReauth = function (req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null) {
-    res.json({"resp_code" : "1"});
+    res.json({"resp_code" : "1"}, {"resp_msg": "Invalid/empty parameters"});
     return;
   }
 
   User.find({phone: req.body.phone, _id: req.body.user_id, access_token: req.body.access_token}, function (err, users) {
-    if (err) res.json({"resp_code" : "1"});
+    if (err) res.json({"resp_code" : "1"}, {"resp_msg": "User.find failed: " + err});
     else {
       if (users.length == 1) {
         var date = Math.floor((new Date).getTime() / 1000);
@@ -168,7 +168,7 @@ exports.AuthReauth = function (req, res) {
 
       } else if (users.length == 0) {
         res.json({"resp_code" : "5"});
-      } else res.json({"resp_code" : "1"});
+      } else res.json({"resp_code" : "1"}, {"resp_msg": "CRITICAL: More than one user with this phone"});
     }
   });
 };
@@ -176,7 +176,7 @@ exports.AuthReauth = function (req, res) {
 //PROFILE ENDPOINTS
 exports.ProfileUpdate = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.name == null) {
-    res.json({"resp_code" : "1"});
+    res.json({"resp_code" : "1"}, {"resp_msg": "Invalid/empty parameters"});
     return;
   }
 
@@ -187,7 +187,7 @@ exports.ProfileUpdate = function(req, res) {
 
 exports.ProfileGet = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null) {
-    res.json({"resp_code": "1"});
+    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
     return;
   }
 
@@ -203,12 +203,12 @@ exports.ProfileGet = function(req, res) {
 exports.CarsAdd = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null
     || req.body.car_name == null || req.body.car_make == null || req.body.car_year == null || req.body.car_model == null || req.body.car_length == null) {
-    res.json({"resp_code": "1"});
+    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code": "1"});
+    if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.findOne failed: " + err});
     else {
       var cars = user.cars
       if (req.body.car_vin != "" && req.body.car_vin != null) { //if vin is provided, check for duplicate VINs
@@ -230,7 +230,7 @@ exports.CarsAdd = function(req, res) {
       cars.push(newCar);
 
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {cars: cars}, function (err, count, status) {
-        res.json({"resp_code": (err ? "1" : "100")});
+        res.json({"resp_code": (err ? "1" : "100")}, (err ? {"resp_msg": "User.update failed: " + err} : null));
       });
     }
   });
@@ -238,12 +238,12 @@ exports.CarsAdd = function(req, res) {
 
 exports.CarsRemove = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.car_id == null) {
-    res.json({"resp_code": "1"});
+    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code" : "1"});
+    if (err) res.json({"resp_code" : "1"}, {"resp_msg": "User.findOne failed: " + err});
     else {
       var cars = user.cars;
       var deleted = false;
@@ -256,12 +256,12 @@ exports.CarsRemove = function(req, res) {
       }
 
       if (!deleted) { //car to delete wasn't found
-        res.json({"resp_code": "1"});
+        res.json({"resp_code": "1"}, {"resp_msg": "Car to delete not found"});
         return;
       }
 
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {cars: cars}, function (err, count, status) {
-        res.json({"resp_code": (err ? "1" : "100")});
+        res.json({"resp_code": (err ? "1" : "100")}, (err ? {"resp_msg": "User.update failed: " + err} : null));
       });
     }
   });
@@ -269,12 +269,12 @@ exports.CarsRemove = function(req, res) {
 
 exports.CarsUpdate = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.car_name == null || req.body.car_make == null || req.body.car_year == null || req.body.car_model == null || req.body.car_length == null || req.body.car_id == null) {
-    res.json({"resp_code": "1"});
+    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code": "1"});
+    if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.findOne failed: " + err});
     else {
       var cars = user.cars;
 
@@ -291,7 +291,7 @@ exports.CarsUpdate = function(req, res) {
       }
 
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {cars: cars}, function (err, count, status) {
-        res.json({"resp_code": (err ? "1" : "100")});
+        res.json({"resp_code": (err ? "1" : "100")}, (err ? {"resp_msg": "User.update failed: " + err} : null));
       });
     }
   });
@@ -299,12 +299,12 @@ exports.CarsUpdate = function(req, res) {
 
 exports.CarsGet = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null) {
-    res.json({"resp_code" : "1"});
+    res.json({"resp_code" : "1"}, {"resp_msg": "Invalid/empty parameters"});
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code" : "1"});
+    if (err) res.json({"resp_code" : "1"}, {"resp_msg": "User.findOne failed: " + err});
     else {
       res.json(user.cars);
     }
@@ -314,12 +314,12 @@ exports.CarsGet = function(req, res) {
 //Locations
 exports.LocsAdd = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null || req.body.loc_address == null || req.body.loc_name == null) {
-    res.json({"resp_code": "1"});
+    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code": "1"});
+    if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.findOne failed: " + err});
     else {
       var locs = user.locations;
       for (var i = 0; i < locs.length; i++) { //check for location duplicates
@@ -335,7 +335,7 @@ exports.LocsAdd = function(req, res) {
       });
       locs.push(newLoc);
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {locations: locs}, function (err, count, status) {
-        res.json({"resp_code": (err ? "1" : "100")});
+        res.json({"resp_code": (err ? "1" : "100")}, (err ? {"resp_msg": "User.update failed: " + err} : null));
       });
     }
   });
@@ -343,12 +343,12 @@ exports.LocsAdd = function(req, res) {
 
 exports.LocsRemove = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null) {
-    res.json({"resp_code": "1"});
+    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code" : "1"});
+    if (err) res.json({"resp_code" : "1"}, {"resp_msg": "User.findOne failed: " + err});
     else {
       var locs = user.locations;
       var deleted = false;
@@ -361,12 +361,12 @@ exports.LocsRemove = function(req, res) {
       }
 
       if (!deleted) { //loc to delete wasn't found
-        res.json({"resp_code": "1"});
+        res.json({"resp_code": "1"}, {"resp_msg": "Location to delete not found"});
         return;
       }
 
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {locations: locs}, function (err, count, status) {
-        res.json({"resp_code": (err ? "1" : "100")});
+        res.json({"resp_code": (err ? "1" : "100")}, (err ? {"resp_msg": "User.update failed: " + err} : null));
       });
     }
   });
@@ -374,12 +374,12 @@ exports.LocsRemove = function(req, res) {
 
 exports.LocsUpdate = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null || req.body.loc_address == null || req.body.loc_name == null) {
-    res.json({"resp_code": "1"});
+    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code": "1"});
+    if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.findOne failed: " + err});
     else {
       var locs = user.locations;
 
@@ -392,7 +392,7 @@ exports.LocsUpdate = function(req, res) {
       }
 
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {locations: locs}, function (err, count, status) {
-        res.json({"resp_code": (err ? "1" : "100")});
+        res.json({"resp_code": (err ? "1" : "100")}, (err ? {"resp_msg": "User.update failed: " + err} : null));
       });
     }
   });
@@ -400,19 +400,19 @@ exports.LocsUpdate = function(req, res) {
 
 exports.LocsGet = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null) {
-    res.json({"resp_code" : "1"});
+    res.json({"resp_code" : "1"}, {"resp_msg": "Invalid/empty parameters"});
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code" : "1"});
+    if (err) res.json({"resp_code" : "1"}, {"resp_msg": "User.findOne failed: " + err});
     else {
       res.json(user.locations);
     }
   });
 };
 
-//
+
 function sendText(phone, pin) {
   var opts = {
     to: phone,
@@ -424,3 +424,5 @@ function sendText(phone, pin) {
     console.log(msg);
   });
 }
+
+/* Copyright © 2017 Avi Glozman and Terrance Li */

@@ -1,4 +1,5 @@
 'use strict';
+
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
@@ -11,7 +12,7 @@ var SpotSchema = new Schema({
 
 var LocationSchema = new Schema({
   address: String,
-  loc_id: String,
+  loc_id: String, //separate from auto-generated _id
   name: String
 });
 
@@ -23,7 +24,7 @@ var CarSchema = new Schema({
   model: String,
   length: {
     type: Number,
-    default: 4.4
+    default: 4.4 //Default car length
   }
 });
 
@@ -45,3 +46,5 @@ module.exports = mongoose.model('Spots', SpotSchema);
 module.exports = mongoose.model('Users', UserSchema);
 module.exports = Car;
 module.exports = Location;
+
+/* Copyright © 2017 Avi Glozman and Terrance Li */
