@@ -22,7 +22,7 @@ const twilio = require('twilio')(accountSid, authToken);
 
 exports.SpotsSingle = function(req, res) {
   if (req.body.spot_id == null) {
-    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
+    res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
 
@@ -36,7 +36,7 @@ exports.SpotsSingle = function(req, res) {
 
 exports.SpotsOnscreen = function(req, res) {
   if (req.body.upper_lat == null || req.body.lower_lat == null || req.body.upper_lon == null || req.body.lower_lon == null) {
-    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
+    res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
 
@@ -50,7 +50,7 @@ exports.SpotsOnscreen = function(req, res) {
 
 exports.SpotsStatus = function(req, res) {
   if (req.body.status == null || req.body.spot_id == null) {
-    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
+    res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
 
@@ -64,7 +64,7 @@ exports.SpotsStatus = function(req, res) {
 
 exports.SpotsAdd = function(req, res) {
   if (req.body.lat == null || req.body.lon == null) {
-    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
+    res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
 
@@ -86,7 +86,7 @@ exports.SpotsGetAll = function(req, res) {
 //AUTHENTICATION ENDPOINTS
 exports.AuthPin = function(req, res) {
   if (req.body.phone == null || req.body.phone == "") {
-    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
+    res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
   User.find({phone: req.body.phone}, function(err, user) {
@@ -111,7 +111,7 @@ exports.AuthPin = function(req, res) {
             res.json({"resp_code" : "100"});
           }
         });
-      } else res.json({"resp_code": "1"}, {"resp_msg": "CRITICAL: More than a single user with this phone"}); //more than a single user w/ a phone number; should never happen
+      } else res.json({"resp_code": "1", "resp_msg": "CRITICAL: More than a single user with this phone"}); //more than a single user w/ a phone number; should never happen
     }
   });
 };
@@ -187,7 +187,7 @@ exports.ProfileUpdate = function(req, res) {
 
 exports.ProfileGet = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null) {
-    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
+    res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
 
@@ -203,7 +203,7 @@ exports.ProfileGet = function(req, res) {
 exports.CarsAdd = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null
     || req.body.car_name == null || req.body.car_make == null || req.body.car_year == null || req.body.car_model == null || req.body.car_length == null) {
-    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
+    res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
 
@@ -238,7 +238,7 @@ exports.CarsAdd = function(req, res) {
 
 exports.CarsRemove = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.car_id == null) {
-    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
+    res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
 
@@ -256,7 +256,7 @@ exports.CarsRemove = function(req, res) {
       }
 
       if (!deleted) { //car to delete wasn't found
-        res.json({"resp_code": "1"}, {"resp_msg": "Car to delete not found"});
+        res.json({"resp_code": "1", "resp_msg": "Car to delete not found"});
         return;
       }
 
@@ -269,7 +269,7 @@ exports.CarsRemove = function(req, res) {
 
 exports.CarsUpdate = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.car_name == null || req.body.car_make == null || req.body.car_year == null || req.body.car_model == null || req.body.car_length == null || req.body.car_id == null) {
-    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
+    res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
 
@@ -314,7 +314,7 @@ exports.CarsGet = function(req, res) {
 //Locations
 exports.LocsAdd = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null || req.body.loc_address == null || req.body.loc_name == null) {
-    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
+    res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
 
@@ -343,7 +343,7 @@ exports.LocsAdd = function(req, res) {
 
 exports.LocsRemove = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null) {
-    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
+    res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
 
@@ -361,7 +361,7 @@ exports.LocsRemove = function(req, res) {
       }
 
       if (!deleted) { //loc to delete wasn't found
-        res.json({"resp_code": "1"}, {"resp_msg": "Location to delete not found"});
+        res.json({"resp_code": "1", "resp_msg": "Location to delete not found"});
         return;
       }
 
@@ -374,7 +374,7 @@ exports.LocsRemove = function(req, res) {
 
 exports.LocsUpdate = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null || req.body.loc_address == null || req.body.loc_name == null) {
-    res.json({"resp_code": "1"}, {"resp_msg": "Invalid/empty parameters"});
+    res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
 
