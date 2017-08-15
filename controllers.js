@@ -70,7 +70,7 @@ exports.SpotsAdd = function(req, res) {
 
   var newSpot = new Spot({status: (req.body.status ? req.body.status : "F"), lat: req.body.lat, lon: req.body.lon, sector_id: req.body.sector_id});
   newSpot.save(function (err, spot) {
-    res.json({"resp_code": (err ? "1" : "100")}, (err ? {"resp_msg": "Spot.save failed: " + err} : null));
+    res.json({"resp_code": (err ? "1" : "100"), (err ? ("resp_msg": "Spot.save failed: " + err) : null)});
   });
 }
 
@@ -230,7 +230,7 @@ exports.CarsAdd = function(req, res) {
       cars.push(newCar);
 
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {cars: cars}, function (err, count, status) {
-        res.json({"resp_code": (err ? "1" : "100")}, (err ? {"resp_msg": "User.update failed: " + err} : null));
+        res.json({"resp_code": (err ? "1" : "100"), (err ? ("resp_msg": "User.update failed: " + err) : null)});
       });
     }
   });
@@ -261,7 +261,7 @@ exports.CarsRemove = function(req, res) {
       }
 
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {cars: cars}, function (err, count, status) {
-        res.json({"resp_code": (err ? "1" : "100")}, (err ? {"resp_msg": "User.update failed: " + err} : null));
+        res.json({"resp_code": (err ? "1" : "100"), (err ? ("resp_msg": "User.update failed: " + err) : null)});
       });
     }
   });
@@ -291,7 +291,7 @@ exports.CarsUpdate = function(req, res) {
       }
 
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {cars: cars}, function (err, count, status) {
-        res.json({"resp_code": (err ? "1" : "100")}, (err ? {"resp_msg": "User.update failed: " + err} : null));
+        res.json({"resp_code": (err ? "1" : "100"), (err ? ("resp_msg": "User.update failed: " + err) : null)});
       });
     }
   });
@@ -335,7 +335,7 @@ exports.LocsAdd = function(req, res) {
       });
       locs.push(newLoc);
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {locations: locs}, function (err, count, status) {
-        res.json({"resp_code": (err ? "1" : "100")}, (err ? {"resp_msg": "User.update failed: " + err} : null));
+        res.json({"resp_code": (err ? "1" : "100"), (err ? ("resp_msg": "User.update failed: " + err) : null)});
       });
     }
   });
@@ -366,7 +366,7 @@ exports.LocsRemove = function(req, res) {
       }
 
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {locations: locs}, function (err, count, status) {
-        res.json({"resp_code": (err ? "1" : "100")}, (err ? {"resp_msg": "User.update failed: " + err} : null));
+        res.json({"resp_code": (err ? "1" : "100"), (err ? ("resp_msg": "User.update failed: " + err) : null)});
       });
     }
   });
@@ -392,7 +392,7 @@ exports.LocsUpdate = function(req, res) {
       }
 
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {locations: locs}, function (err, count, status) {
-        res.json({"resp_code": (err ? "1" : "100")}, (err ? {"resp_msg": "User.update failed: " + err} : null));
+        res.json({"resp_code": (err ? "1" : "100"), (err ? ("resp_msg": "User.update failed: " + err) : null)});
       });
     }
   });
