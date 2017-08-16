@@ -27,7 +27,7 @@ exports.SpotsSingle = function(req, res) {
   }
 
   Spot.findOne({_id: req.body.spot_id}, function (err, spot) {
-    if (err) res.json({"resp_code": "1"}, {"resp_msg": "Spots.findOne failed: " + err});
+    if (err) res.json({"resp_code": "1", "resp_msg": "Spots.findOne failed: " + err});
     else {
       res.json(spot);
     }
@@ -41,7 +41,7 @@ exports.SpotsOnscreen = function(req, res) {
   }
 
   Spot.find({lat: {$gte: req.body.lower_lat, $lte: req.body.upper_lat}, lon: {$gte: req.body.lower_lon, $lte: req.body.upper_lon}}, function (err, spots) {
-    if (err) res.json({"resp_code": "1"}, {"resp_msg": "Spots.find failed: " + err});
+    if (err) res.json({"resp_code": "1", "resp_msg": "Spots.find failed: " + err});
     else {
       res.json(spots);
     }
@@ -55,7 +55,7 @@ exports.SpotsStatus = function(req, res) {
   }
 
   Spot.update({_id: req.body.spot_id}, {status: req.body.status}, function (err, count, status) {
-    if (err) res.json({"resp_code": "1"}, {"resp_msg": "Spots.update failed: " + err});
+    if (err) res.json({"resp_code": "1", "resp_msg": "Spots.update failed: " + err});
     else {
       res.json({"resp_code": "100"});
     }
@@ -77,7 +77,7 @@ exports.SpotsAdd = function(req, res) {
 
 exports.SpotsGetAll = function(req, res) {
   Spot.find({}, function (err, spots) {
-    if (err) res.json({"resp_code": "1"}, {"resp_msg": "Spots.find failed: " + err});
+    if (err) res.json({"resp_code": "1", "resp_msg": "Spots.find failed: " + err});
     else {
       res.json(spots);
     }
@@ -91,13 +91,13 @@ exports.AuthPin = function(req, res) {
     return;
   }
   User.find({phone: req.body.phone}, function(err, user) {
-    if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.find failed: " + err});
+    if (err) res.json({"resp_code": "1", "resp_msg": "User.find failed: " + err});
     else {
       var randomPin = Math.floor(1000 + Math.random() * 9000);
       var date = Math.floor((new Date).getTime() / 1000);
       if (user.length == 1) { //returning user
         User.update({phone: req.body.phone}, {pin: randomPin, pin_timestamp: date}, function (err, count, status) {
-          if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.update failed: " + err});
+          if (err) res.json({"resp_code": "1", "resp_msg": "User.update failed: " + err});
           else {
             sendText(req.body.phone, randomPin);
             res.json({"resp_code" : "100"});
@@ -106,7 +106,7 @@ exports.AuthPin = function(req, res) {
       } else if (user.length == 0) { //new user
         var newUser = new User({pin: randomPin, pin_timestamp: date, phone: req.body.phone});
         newUser.save(function (err, user) {
-          if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.save failed: " + err});
+          if (err) res.json({"resp_code": "1", "resp_msg": "User.save failed: " + err});
           else {
             sendText(req.body.phone, randomPin);
             res.json({"resp_code" : "100"});
@@ -119,11 +119,11 @@ exports.AuthPin = function(req, res) {
 
 exports.AuthVerify = function(req, res) {
   if (req.body.phone == null || req.body.phone == "") {
-    res.json({"resp_code" : "1"}, {"resp_msg": "Invalid/empty parameters"});
+    res.json({"resp_code" : "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
   User.findOne({phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code" : "1"}, {"resp_msg": "User.findOne failed: " + err});
+    if (err) res.json({"resp_code" : "1", "resp_msg": "User.findOne failed: " + err});
     else {
       var date = Math.floor((new Date).getTime() / 1000);
       if (date - user.pin_timestamp < 120) {
@@ -133,10 +133,10 @@ exports.AuthVerify = function(req, res) {
           var token = hat();
 
           User.update({phone: req.body.phone, pin: req.body.pin}, {access_token: token, token_timestamp: date}, function (err, count, status) {
-            if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.update failed: " + err});
+            if (err) res.json({"resp_code": "1", "resp_msg": "User.update failed: " + err});
             else {
               User.findOne({phone: req.body.phone, pin: req.body.pin}, function (err, user) {
-                if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.findOne failed: " + err});
+                if (err) res.json({"resp_code": "1", "resp_msg": "User.findOne failed: " + err});
                 else {
                   res.json({access_token : user.access_token, user_id : user._id, resp_code : (user.name == null ? "101" : "102")});
                 }
@@ -154,12 +154,12 @@ exports.AuthVerify = function(req, res) {
 
 exports.AuthReauth = function (req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null) {
-    res.json({"resp_code" : "1"}, {"resp_msg": "Invalid/empty parameters"});
+    res.json({"resp_code" : "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
 
   User.find({phone: req.body.phone, _id: req.body.user_id, access_token: req.body.access_token}, function (err, users) {
-    if (err) res.json({"resp_code" : "1"}, {"resp_msg": "User.find failed: " + err});
+    if (err) res.json({"resp_code" : "1", "resp_msg": "User.find failed: " + err});
     else {
       if (users.length == 1) {
         var date = Math.floor((new Date).getTime() / 1000);
@@ -169,7 +169,7 @@ exports.AuthReauth = function (req, res) {
 
       } else if (users.length == 0) {
         res.json({"resp_code" : "5"});
-      } else res.json({"resp_code" : "1"}, {"resp_msg": "CRITICAL: More than one user with this phone"});
+      } else res.json({"resp_code" : "1", "resp_msg": "CRITICAL: More than one user with this phone"});
     }
   });
 };
@@ -177,7 +177,7 @@ exports.AuthReauth = function (req, res) {
 //PROFILE ENDPOINTS
 exports.ProfileUpdate = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.name == null) {
-    res.json({"resp_code" : "1"}, {"resp_msg": "Invalid/empty parameters"});
+    res.json({"resp_code" : "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
 
@@ -209,7 +209,7 @@ exports.CarsAdd = function(req, res) {
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.findOne failed: " + err});
+    if (err) res.json({"resp_code": "1", "resp_msg": "User.findOne failed: " + err});
     else {
       var cars = user.cars
       if (req.body.car_vin != "" && req.body.car_vin != null) { //if vin is provided, check for duplicate VINs
@@ -245,7 +245,7 @@ exports.CarsRemove = function(req, res) {
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code" : "1"}, {"resp_msg": "User.findOne failed: " + err});
+    if (err) res.json({"resp_code" : "1", "resp_msg": "User.findOne failed: " + err});
     else {
       var cars = user.cars;
       var deleted = false;
@@ -277,7 +277,7 @@ exports.CarsUpdate = function(req, res) {
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.findOne failed: " + err});
+    if (err) res.json({"resp_code": "1", "resp_msg": "User.findOne failed: " + err});
     else {
       var cars = user.cars;
 
@@ -303,12 +303,12 @@ exports.CarsUpdate = function(req, res) {
 
 exports.CarsGet = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null) {
-    res.json({"resp_code" : "1"}, {"resp_msg": "Invalid/empty parameters"});
+    res.json({"resp_code" : "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code" : "1"}, {"resp_msg": "User.findOne failed: " + err});
+    if (err) res.json({"resp_code" : "1", "resp_msg": "User.findOne failed: " + err});
     else {
       res.json(user.cars);
     }
@@ -323,7 +323,7 @@ exports.LocsAdd = function(req, res) {
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.findOne failed: " + err});
+    if (err) res.json({"resp_code": "1", "resp_msg": "User.findOne failed: " + err});
     else {
       var locs = user.locations;
       for (var i = 0; i < locs.length; i++) { //check for location duplicates
@@ -353,7 +353,7 @@ exports.LocsRemove = function(req, res) {
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code" : "1"}, {"resp_msg": "User.findOne failed: " + err});
+    if (err) res.json({"resp_code" : "1", "resp_msg": "User.findOne failed: " + err});
     else {
       var locs = user.locations;
       var deleted = false;
@@ -385,7 +385,7 @@ exports.LocsUpdate = function(req, res) {
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code": "1"}, {"resp_msg": "User.findOne failed: " + err});
+    if (err) res.json({"resp_code": "1", "resp_msg": "User.findOne failed: " + err});
     else {
       var locs = user.locations;
 
@@ -407,12 +407,12 @@ exports.LocsUpdate = function(req, res) {
 
 exports.LocsGet = function(req, res) {
   if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null) {
-    res.json({"resp_code" : "1"}, {"resp_msg": "Invalid/empty parameters"});
+    res.json({"resp_code" : "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
 
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-    if (err) res.json({"resp_code" : "1"}, {"resp_msg": "User.findOne failed: " + err});
+    if (err) res.json({"resp_code" : "1", "resp_msg": "User.findOne failed: " + err});
     else {
       res.json(user.locations);
     }
