@@ -419,6 +419,18 @@ exports.LocsGet = function(req, res) {
   });
 };
 
+exports.UserDelete = function (req, res) {
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null) {
+    res.json({"resp_code" : "1", "resp_msg": "Invalid/empty parameters"});
+    return;
+  }
+
+  User.remove({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, result) {
+    if (err) res.json("resp_code": "1");
+    else res.json("resp_code": "100");
+  });
+}
+
 
 function sendText(phone, pin) {
   var opts = {

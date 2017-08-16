@@ -65,6 +65,10 @@ module.exports = function(app) {
 
   app.route("/api/users/profile/locs/get")
     .post(aspaceController.LocsGet);
+
+  //User delete
+  app.route("/api/users/delete")
+    .post(aspaceController.UserDelete);
 }
 
 /* Copyright © 2017 Avi Glozman and Terrance Li */
