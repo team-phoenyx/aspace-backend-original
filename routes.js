@@ -2,6 +2,10 @@
 module.exports = function(app) {
   var aspaceController = require("./controllers.js");
 
+  //PING ENDPOINT
+  app.route("/api/ping")
+    .post(aspaceController.Ping);
+
   //SPOTS ENDPOINTS
   app.route("/api/spots/single")
     .post(aspaceController.SpotsSingle);
