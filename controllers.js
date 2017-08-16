@@ -21,7 +21,7 @@ const phoneNumber = '+13123456230';
 const twilio = require('twilio')(accountSid, authToken);
 
 exports.Ping = function (req, res) {
-  res.json({"ping": "pong"});
+  res.json("pong");
 }
 
 exports.SpotsSingle = function(req, res) {

@@ -4,7 +4,7 @@ module.exports = function(app) {
 
   //PING ENDPOINT
   app.route("/api/ping")
-    .post(aspaceController.Ping);
+    .get(aspaceController.Ping);
 
   //SPOTS ENDPOINTS
   app.route("/api/spots/single")
