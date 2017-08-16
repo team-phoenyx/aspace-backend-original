@@ -3,8 +3,9 @@ module.exports = function(app) {
   var aspaceController = require("./controllers.js");
 
   //PING ENDPOINT
-  app.route("/api/ping")
-    .get(aspaceController.Ping);
+  app.get("/api/ping", function (req, res) {
+    res.json("pong");
+  });
 
   //SPOTS ENDPOINTS
   app.route("/api/spots/single")
