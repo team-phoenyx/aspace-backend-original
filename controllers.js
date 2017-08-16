@@ -195,7 +195,7 @@ exports.ProfileGet = function(req, res) {
   User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function(err, user) {
     if (err || user == null) res.json({"resp_code": "7"});
     else {
-      res.json({"user_id": user._id, "name": user.name ? user.name : "", "cars": user.cars, "locs": user.locations});
+      res.json({"name": user.name ? user.name : "", "cars": user.cars, "locs": user.locations});
     }
   });
 };
