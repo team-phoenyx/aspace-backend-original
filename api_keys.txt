@@ -1,9 +1,0 @@
-rough file for keeping track of stuff; DO NOT SHARE!
-
-MAPBOX:
-pk.eyJ1IjoicGFyY2FyZSIsImEiOiJjajN2cjU4MGkwMGE1MnFvN3cxOWY5azFlIn0.qmmgzy-RijWWqV-ZbmiZbg
-//TWILIO stuff
-const accountSid = 'AC7b77e08a33aadf7cad22329888e8a381';
-const authToken = '7e9a098a2c077de2e70aa1b5f8fee758';
-const phoneNumber = '+13123456230';
-//
