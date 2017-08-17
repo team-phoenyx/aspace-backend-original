@@ -38,7 +38,7 @@ exports.SpotsOnscreen = function(req, res) {
     return;
   }
 
-  console.log("Parameters for finding spots: " + req.body.lower_lat + "-" + req.body.upper_lat + ", " + req.body.lower_lon + "-" + req.body.upper_lat);
+  console.log("Parameters for finding spots: " + req.body.lower_lat + "-" + req.body.upper_lat + ", " + req.body.lower_lon + "-" + req.body.upper_lon);
   Spot.find({lat: {$gte: parseFloat(req.body.lower_lat), $lte: parseFloat(req.body.upper_lat)}, lon: {$gte: parseFloat(req.body.lower_lon), $lte: parseFloat(req.body.upper_lon)}}, function (err, spots) {
     if (err || spots == null) res.json({"resp_code": "1", "resp_msg": "Spots.find failed: " + err});
     else {
