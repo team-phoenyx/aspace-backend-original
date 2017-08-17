@@ -2,6 +2,11 @@
 module.exports = function(app) {
   var aspaceController = require("./controllers.js");
 
+  //PING ENDPOINT
+  app.get("/api/ping", function (req, res) {
+    res.json("pong");
+  });
+
   //SPOTS ENDPOINTS
   app.route("/api/spots/single")
     .post(aspaceController.SpotsSingle);
@@ -60,6 +65,10 @@ module.exports = function(app) {
 
   app.route("/api/users/profile/locs/get")
     .post(aspaceController.LocsGet);
+
+  //User delete
+  app.route("/api/users/delete")
+    .post(aspaceController.UserDelete);
 }
 
 /* Copyright © 2017 Avi Glozman and Terrance Li */
