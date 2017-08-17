@@ -1,10 +1,9 @@
 'use strict';
 //dependencies
-
 const colors = require("colors/safe");
-const mysql = require("mysql");
 const request = require("request-promise");
 const hat = require("hat");
+
 //mongodb stuff
 const models = require("./schemas.js");
 const mongoose = require("mongoose"),
@@ -12,12 +11,11 @@ const mongoose = require("mongoose"),
   Location = mongoose.model('Location'),
   User = mongoose.model('Users'),
   Spot = mongoose.model('Spots');
-var connection = require("mysql");
+
 //TWILIO stuff
 const accountSid = 'AC7b77e08a33aadf7cad22329888e8a381';
 const authToken = '7e9a098a2c077de2e70aa1b5f8fee758';
 const phoneNumber = '+13123456230';
-//
 const twilio = require('twilio')(accountSid, authToken);
 
 exports.SpotsSingle = function(req, res) {
