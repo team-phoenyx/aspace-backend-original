@@ -424,8 +424,8 @@ exports.UserDelete = function (req, res) {
   }
 
   User.remove({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, result) {
-    if (err) res.json("resp_code": "1");
-    else res.json("resp_code": "100");
+    if (err) res.json({"resp_code": "1"});
+    else res.json({"resp_code": "100"});
   });
 }
 
