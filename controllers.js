@@ -316,7 +316,7 @@ exports.CarsGet = function(req, res) {
 
 //Locations
 exports.LocsAdd = function(req, res) {
-  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_address == null || req.body.loc_name == null || req.body.lat == null || req.body.lon -- null) {
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_address == null || req.body.loc_name == null || req.body.lat == null || req.body.lon == null) {
     res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
@@ -391,7 +391,7 @@ exports.LocsRemove = function(req, res) {
 };
 
 exports.LocsUpdate = function(req, res) {
-  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null || req.body.loc_address == null || req.body.loc_name == null || req.body.lat == null || req.body.lon -- null) {
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null || req.body.loc_address == null || req.body.loc_name == null || req.body.lat == null || req.body.lon == null) {
     res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
