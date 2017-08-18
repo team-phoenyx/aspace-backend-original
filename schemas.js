@@ -12,8 +12,9 @@ var SpotSchema = new Schema({
 
 var LocationSchema = new Schema({
   address: String,
-  loc_id: String, //separate from auto-generated _id
-  name: String
+  name: String,
+  lat: Number,
+  lon: Number
 });
 
 var CarSchema = new Schema({
