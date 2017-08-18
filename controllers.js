@@ -342,7 +342,7 @@ exports.LocsAdd = function(req, res) {
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {locations: locs}, function (err, count, status) {
         if (err) res.json({"resp_code": "1", "resp_msg": "User.update failed: " + err});
         else {
-          User.findOne({_id: reqp.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
+          User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
             var newLocs = user.locations;
             for (i = 0; i < newLocs.length; i++) {
               if (newLocs[i].lat == req.body.lat && newLocs[i].lon == req.body.lon && newLocs[i].name == req.body.loc_name && newLocs[i].address == req.body.loc_address) {
