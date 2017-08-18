@@ -38,7 +38,8 @@ exports.SpotsOnscreen = function(req, res) {
     return;
   }
 
-  Spot.find({lat: {$gte: req.body.lower_lat, $lte: req.body.upper_lat}, lon: {$gte: req.body.lower_lon, $lte: req.body.upper_lon}}, function (err, spots) {
+  console.log("Parameters for finding spots: " + req.body.lower_lat + "-" + req.body.upper_lat + ", " + req.body.lower_lon + "-" + req.body.upper_lon);
+  Spot.find({lat: {$gte: parseFloat(req.body.lower_lat), $lte: parseFloat(req.body.upper_lat)}, lon: {$gte: parseFloat(req.body.lower_lon), $lte: parseFloat(req.body.upper_lon)}}, function (err, spots) {
     if (err || spots == null) res.json({"resp_code": "1", "resp_msg": "Spots.find failed: " + err});
     else {
       res.json(spots);
@@ -315,7 +316,7 @@ exports.CarsGet = function(req, res) {
 
 //Locations
 exports.LocsAdd = function(req, res) {
-  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null || req.body.loc_address == null || req.body.loc_name == null) {
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_address == null || req.body.loc_name == null || req.body.lat == null || req.body.lon == null) {
     res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
@@ -324,21 +325,34 @@ exports.LocsAdd = function(req, res) {
     if (err || user == null) res.json({"resp_code": "1", "resp_msg": "User.findOne failed: " + err});
     else {
       var locs = user.locations;
+      /* NOT CHECKING FOR DUPLICATES (LOC_ID DOESN'T WORK)
       for (var i = 0; i < locs.length; i++) { //check for location duplicates
         if (locs[i].loc_id == req.body.loc_id) {
           res.json({"resp_code": "8"});
           return; //DUPLICATE LOCATIONS
         }
-      }
+      }*/
       var newLoc = new Location({
         name: req.body.loc_name,
         address: req.body.loc_address,
-        loc_id: req.body.loc_id
+        lat: req.body.lat,
+        lon: req.body.lon
       });
       locs.push(newLoc);
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {locations: locs}, function (err, count, status) {
         if (err) res.json({"resp_code": "1", "resp_msg": "User.update failed: " + err});
-        else res.json({"resp_code": "100"});
+        else {
+          User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
+            var newLocs = user.locations;
+            for (var i = 0; i < newLocs.length; i++) {
+              if (newLocs[i].lat == req.body.lat && newLocs[i].lon == req.body.lon && newLocs[i].name == req.body.loc_name && newLocs[i].address == req.body.loc_address) {
+                res.json({"resp_code": "100", "resp_msg": newLocs[i]._id});
+                return;
+              }
+            }
+            res.json({"resp_code": "1", "resp_msg": "Location not found after adding"});
+          });
+        }
       });
     }
   });
@@ -356,7 +370,7 @@ exports.LocsRemove = function(req, res) {
       var locs = user.locations;
       var deleted = false;
       for (var i = 0; i < locs.length; i++) {
-        if (locs[i].loc_id == req.body.loc_id) {
+        if (locs[i]._id == req.body.loc_id) {
           locs.splice(i, 1);
           deleted = true;
           break;
@@ -377,7 +391,7 @@ exports.LocsRemove = function(req, res) {
 };
 
 exports.LocsUpdate = function(req, res) {
-  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null || req.body.loc_address == null || req.body.loc_name == null) {
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null || req.body.loc_address == null || req.body.loc_name == null || req.body.lat == null || req.body.lon == null) {
     res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
@@ -388,9 +402,11 @@ exports.LocsUpdate = function(req, res) {
       var locs = user.locations;
 
       for (var i = 0; i < locs.length; i++) {
-        if (locs[i].loc_id == req.body.loc_id) {
+        if (locs[i]._id == req.body.loc_id) {
           locs[i].name = req.body.loc_name;
           locs[i].address = req.body.loc_address;
+          locs[i].lat = req.body.lat;
+          locs[i].lon = req.body.lon;
           break;
         }
       }

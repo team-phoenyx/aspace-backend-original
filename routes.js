@@ -1,11 +1,16 @@
 'use strict';
 module.exports = function(app) {
   var aspaceController = require("./controllers.js");
+  var aspaceAlgorithm = require("./navigation.js");
 
   //PING ENDPOINT
   app.get("/api/ping", function (req, res) {
     res.json("pong");
   });
+
+  // NAV ALGORITHM
+  app.route("/api/navigate/")
+    .post(aspaceAlgorithm.FindRoute);
 
   //SPOTS ENDPOINTS
   app.route("/api/spots/single")
