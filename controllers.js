@@ -346,11 +346,11 @@ exports.LocsAdd = function(req, res) {
             var newLocs = user.locations;
             for (i = 0; i < newLocs.length; i++) {
               if (newLocs[i].lat == req.body.lat && newLocs[i].lon == req.body.lon && newLocs[i].name == req.body.loc_name && newLocs[i].address == req.body.loc_address) {
-                res.json("resp_code": "100", "resp_msg": newLocs[i]._id);
+                res.json({"resp_code": "100", "resp_msg": newLocs[i]._id});
                 return;
               }
             }
-            res.json("resp_code": "1", "resp_msg": "Location not found after adding");
+            res.json({"resp_code": "1", "resp_msg": "Location not found after adding"});
           });
         }
       });
