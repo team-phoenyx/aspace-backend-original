@@ -344,7 +344,7 @@ exports.LocsAdd = function(req, res) {
         else {
           User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
             var newLocs = user.locations;
-            for (i = 0; i < newLocs.length; i++) {
+            for (var i = 0; i < newLocs.length; i++) {
               if (newLocs[i].lat == req.body.lat && newLocs[i].lon == req.body.lon && newLocs[i].name == req.body.loc_name && newLocs[i].address == req.body.loc_address) {
                 res.json({"resp_code": "100", "resp_msg": newLocs[i]._id});
                 return;
