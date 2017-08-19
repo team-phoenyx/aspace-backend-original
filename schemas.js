@@ -13,6 +13,7 @@ var SpotSchema = new Schema({
 var LocationSchema = new Schema({
   address: String,
   name: String,
+  original_name: String,
   lat: Number,
   lon: Number
 });

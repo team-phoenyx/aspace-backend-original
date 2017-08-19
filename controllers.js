@@ -316,7 +316,7 @@ exports.CarsGet = function(req, res) {
 
 //Locations
 exports.LocsAdd = function(req, res) {
-  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_address == null || req.body.loc_name == null || req.body.lat == null || req.body.lon == null) {
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_address == null || req.body.loc_name == null || req.body.loc_original_name == null || req.body.lat == null || req.body.lon == null) {
     res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
@@ -335,6 +335,7 @@ exports.LocsAdd = function(req, res) {
       var newLoc = new Location({
         name: req.body.loc_name,
         address: req.body.loc_address,
+        original_name: req.body.loc_original_name,
         lat: req.body.lat,
         lon: req.body.lon
       });
@@ -342,16 +343,7 @@ exports.LocsAdd = function(req, res) {
       User.update({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, {locations: locs}, function (err, count, status) {
         if (err) res.json({"resp_code": "1", "resp_msg": "User.update failed: " + err});
         else {
-          User.findOne({_id: req.body.user_id, access_token: req.body.access_token, phone: req.body.phone}, function (err, user) {
-            var newLocs = user.locations;
-            for (var i = 0; i < newLocs.length; i++) {
-              if (newLocs[i].lat == req.body.lat && newLocs[i].lon == req.body.lon && newLocs[i].name == req.body.loc_name && newLocs[i].address == req.body.loc_address) {
-                res.json({"resp_code": "100", "resp_msg": newLocs[i]._id});
-                return;
-              }
-            }
-            res.json({"resp_code": "1", "resp_msg": "Location not found after adding"});
-          });
+          res.json({"resp_code": "100", "resp_msg": "Added successfully"});
         }
       });
     }
