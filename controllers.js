@@ -383,7 +383,7 @@ exports.LocsRemove = function(req, res) {
 };
 
 exports.LocsUpdate = function(req, res) {
-  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null || req.body.loc_address == null || req.body.loc_name == null || req.body.lat == null || req.body.lon == null) {
+  if (req.body.phone == null || req.body.user_id == null || req.body.access_token == null || req.body.loc_id == null || req.body.loc_address == null || req.body.loc_name == null || req.body.original_name == null || req.body.lat == null || req.body.lon == null) {
     res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters"});
     return;
   }
@@ -397,8 +397,9 @@ exports.LocsUpdate = function(req, res) {
         if (locs[i]._id == req.body.loc_id) {
           locs[i].name = req.body.loc_name;
           locs[i].address = req.body.loc_address;
-          locs[i].lat = req.body.lat;
-          locs[i].lon = req.body.lon;
+          if (req.body.original_name != "") locs[i].original_name = req.body.original_name;
+          if (req.body.lat != "") locs[i].lat = req.body.lat;
+          if (req.body.lon != "") locs[i].lon = req.body.lon;
           break;
         }
       }
