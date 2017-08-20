@@ -397,8 +397,8 @@ exports.LocsUpdate = function(req, res) {
         if (locs[i]._id == req.body.loc_id) {
           locs[i].name = req.body.loc_name;
           locs[i].address = req.body.loc_address;
-          locs[i].lat = req.body.lat;
-          locs[i].lon = req.body.lon;
+          if (req.body.lat != "") locs[i].lat = req.body.lat;
+          if (req.body.lon != "") locs[i].lon = req.body.lon;
           break;
         }
       }
