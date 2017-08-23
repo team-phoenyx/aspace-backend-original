@@ -70,29 +70,39 @@ exports.FindRoute = function(req, res) {
       return;
     }
 
-  });
-
-
-  // STEP 2:
-  var sectors = [];
-  for (var i = 0; i < spots.length - 1; i++) {
-    var sectorIndex = getIndexOfSectorContainingSpot(sectors, spots[i]);
-    if (sectorIndex == -1){
-      var sector = [spots[i]];
-      sectors.push(sector);
-    } else {
-      sectors[sectorIndex].push(spot[i]);
+    // STEP 2:
+    var sectors = [];
+    for (var i = 0; i < spots.length; i++) {
+      var sectorIndex = getIndexOfSectorContainingSpot(sectors, spots[i]);
+      if (sectorIndex == -1){
+        var sector = [spots[i]];
+        sectors.push(sector);
+      } else {
+        sectors[sectorIndex].push(spot[i]);
+      }
     }
-  }
+    console.log(sectors);
 
-  // STEP 3: (UNFINISHED)
-  var clusters = [];
-  // uhhhh the sorting might be a little tricky. gonna wait until i've
-  // discussed with Terrance.
+    // STEP 3: (UNFINISHED)
+    var clusters = [];
+    clusters.sort(compareSectors);
 
-  // STEP 4: (UNFINISHED)
-  // got too tired, will do on Friday when i'm not dead.
+    clusters.splice(3, clusters.length - 3); //removes everything after 3rd cluster (takes the top 3)
+    //TODO: we have to figure out how we are going to deal with the top cluster only have 1 or 2 parking spots...
+    // Right now I'm just keeping the top 3 no matter what
+
+    // STEP 4: (UNFINISHED)
+    // Not sure how to call mapbox api from here :/
+  });
 };
+
+function compareSectors(a, b) {
+  if (a.length < b.length)
+    return -1;
+  if (a.length > b.length)
+    return 1;
+  return 0;
+}
 
 function querySpots(destLat, destLon, callback) {
   var destinationLatLon = [destLat, destLon];
@@ -115,10 +125,8 @@ function querySpots(destLat, destLon, callback) {
       }
     })},
     function(spots) {
-      //do shit with spots
+      callback(spots);
     });
-
-
 }
 
 function asyncGetSpots(rawBoundingBox, destinationLatLon, func, callback) {
@@ -143,7 +151,7 @@ function asyncGetSpots(rawBoundingBox, destinationLatLon, func, callback) {
 }
 
 function getIndexOfSectorContainingSpot(sectors, spot) {
-  for (var i = 0; i < sectors.length - 1; i++) {
+  for (var i = 0; i < sectors.length; i++) {
     if (spot.sector_id == sector.id){
       return i;
     }
