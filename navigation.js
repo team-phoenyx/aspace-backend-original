@@ -53,15 +53,25 @@ const mongoose = require("mongoose"),
   Spot = mongoose.model('Spots');
 
 
-
+/*
+  Params:
+    req.body.lat: Latitude of destination
+    req.body.lon: Longitude of destination
+*/
 exports.FindRoute = function(req, res) {
-  // STEP 1:
-  var radius = 100;
-  spots = querySpots(req.body.lat, req.body.lon, radius);
-  while (spots.size() < 20) {
-    radius += 50;
-    spots = querySpots(req.body.lat, req.body.lon, radius);
+  if (req.body.lat == null || req.body.lon == null) {
+    res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters. Navigation algorithm failure."});
+    return;
   }
+  // STEP 1:
+  querySpots(req.body.lat, req.body.lon, function (spots) {
+    if (spots == null) {
+      res.json({"resp_code": "1", "resp_msg": "Spot search failure."});
+      return;
+    }
+
+  });
+
 
   // STEP 2:
   var sectors = [];
@@ -84,29 +94,52 @@ exports.FindRoute = function(req, res) {
   // got too tired, will do on Friday when i'm not dead.
 };
 
-function querySpots(destLat, destLon, radius) {
+function querySpots(destLat, destLon, callback) {
   var destinationLatLon = [destLat, destLon];
   // array-ifying it so make it friendly. "destLat" and "destLon" are in req.body
   var rawBoundingBox = getSquareBoundingBox(destinationLatLon, radius);
   // radius is IN YARDS!!!
 
-  if (destinationLatLon == null || radius == null) {
-    res.json({"resp_code": "1", "resp_msg": "Invalid/empty parameters. Navigation algorithm failure."});
-    return;
-  }
-  Spot.find({lat: {$gt: parseFloat(rawBoundingBox[1][0]), $lt: parseFloat(rawBoundingBox[0][0])}, lon: {$gt: parseFloat(rawBoundingBox[1][1]), $lt: parseFloat(rawBoundingBox[1][0])}, status: "F"}, function (err, spots) {
-    if (err || spots == null) res.json({"resp_code": "1", "resp_msg": "Navigation algorithm failed." + err});
-    else {
-      var compatibleSpots = [];
-      for (var i = 0; i < spots.length - 1; i++){
-        var latLon = [spots[i].lat, spots[i].lon];
-        if (haversine(destinationLatLon, latLon) < radius) {
-          compatibleSpots.push(spots[i]);
+  asyncGetSpots(rawBoundingBox, destinationLatLon, function(loop, boundingBox) {
+    Spot.find({lat: {$gt: parseFloat(boundingBox[1][0]), $lt: parseFloat(boundingBox[0][0])}, lon: {$gt: parseFloat(boundingBox[1][1]), $lt: parseFloat(boundingBox[1][0])}, status: "F"}, function (err, spots) {
+      if (err || spots == null) callback(null); //null-check in FindRoute deals with the res.json
+      else {
+        var compatibleSpots = [];
+        for (var i = 0; i < spots.length; i++) {
+          var latLon = [spots[i].lat, spots[i].lon];
+          if (haversine(destinationLatLon, latLon) < radius) {
+            compatibleSpots.push(spots[i]);
+          }
         }
+        loop.next(compatibleSpots);
       }
-      return compatibleSpots;
-    }
-  });
+    })},
+    function(spots) {
+      //do shit with spots
+    });
+
+
+}
+
+function asyncGetSpots(rawBoundingBox, destinationLatLon, func, callback) {
+    var radius = 50;
+    var done = false;
+    var loop = {
+        next: function(compatibleSpots) {
+            if (done) {
+                return;
+            }
+            if (compatibleSpots.length < 20) {
+                radius += 50;
+                func(loop, getSquareBoundingBox(destinationLatLon, radius));
+            } else {
+                done = true;
+                callback(compatibleSpots);
+            }
+        }
+    };
+    loop.next([]);
+    return loop;
 }
 
 function getIndexOfSectorContainingSpot(sectors, spot) {
@@ -159,5 +192,5 @@ function getSquareBoundingBox(originLatLon, distanceInYards) {
   return boundingBox;
 }
 
-/* Copyright © 2017 Avi Glozman*/
+/* Copyright © 2017 Avi Glozman and Terrance Li*/
 // Based on psuedo-code written by Terrance Li
