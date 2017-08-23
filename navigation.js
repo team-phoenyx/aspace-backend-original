@@ -63,12 +63,17 @@ exports.FindRoute = function(req, res) {
     spots = querySpots(req.body.lat, req.body.lon, radius);
   }
 
-  // STEP 2: (UNFINISHED)
+  // STEP 2:
   var sectors = [];
   for (var i = 0; i < spots.length - 1; i++) {
-    var sectorIndex = getIndexOfSectorContainingSpot(sectors)
+    var sectorIndex = getIndexOfSectorContainingSpot(sectors, spots[i]);
+    if (sectorIndex == -1){
+      var sector = [spots[i]];
+      sectors.push(sector);
+    } else {
+      sectors[sectorIndex].push(spot[i]);
+    }
   }
-  // FINISH STEP 2...
 
   // STEP 3: (UNFINISHED)
   var clusters = [];
