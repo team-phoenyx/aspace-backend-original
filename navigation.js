@@ -83,7 +83,7 @@ exports.FindRoute = function(req, res) {
     }
     console.log(sectors);
 
-    // STEP 3: (UNFINISHED)
+    // STEP 3: (NEEDS REVISION?)
     var clusters = [];
     clusters.sort(compareSectors);
 
@@ -91,10 +91,33 @@ exports.FindRoute = function(req, res) {
     //TODO: we have to figure out how we are going to deal with the top cluster only have 1 or 2 parking spots...
     // Right now I'm just keeping the top 3 no matter what
 
-    // STEP 4: (UNFINISHED)
-    // Not sure how to call mapbox api from here :/
-  });
+    // STEP 4:
+    var requestString = `https://api.mapbox.com/directions-matrix/v1/mapbox/driving/`;
+    for (var k = 0; k < clusters.length; k++){
+      requestString += `${clusters[i].longitude},${clusters[i].latitude};`;
+    }
+    var costs = requestMapboxAPIWithURL(requestString);
+
 };
+
+function requestMapboxAPIWithURL(requestString) {
+  var token = 'pk.eyJ1IjoicGFyY2FyZSIsImEiOiJjajN2cjU4MGkwMGE1MnFvN3cxOWY5azFlIn0.qmmgzy-RijWWqV-ZbmiZbg';
+  requestString = requestString.substring(0, requestString.length - 1);
+  options = {
+    uri: requestString + `?access_token=${token}`,
+    method: "GET"
+  };
+  request(options)
+// send a GET request to the Mapbox API
+    .then (function(response){
+        costs = JSON.parse(response);
+        return costs;
+    })
+    .catch(function (err) {
+        console.log(colors.red("error with Mapbox request."))
+    })
+});
+}
 
 function compareSectors(a, b) {
   if (a.length < b.length)
