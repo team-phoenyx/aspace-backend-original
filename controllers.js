@@ -13,9 +13,9 @@ const mongoose = require("mongoose"),
   Spot = mongoose.model('Spots');
 
 //TWILIO stuff
-const accountSid = 'AC7b77e08a33aadf7cad22329888e8a381';
-const authToken = '7e9a098a2c077de2e70aa1b5f8fee758';
-const phoneNumber = '+13123456230';
+const accountSid = '';
+const authToken = '';
+const phoneNumber = '';
 const twilio = require('twilio')(accountSid, authToken);
 
 exports.SpotsSingle = function(req, res) {
