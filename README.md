@@ -1,4 +1,4 @@
-Node.js server/backend written enitrely by Avi Glozman and Terrance Li.
+Node.js server/backend written enitrely by Avi Glozman and Terrance Li. Copyright 2017. All rights reserved.
 
 This code was originally written for use by aspace, Inc., but rights to it were retained by us after some complications within the company. 
 
